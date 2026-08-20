@@ -65,6 +65,7 @@ def main():
         firewall_enabled=True,
         dry_run=True                 # Safe mode
     )
+    orchestrator.anomaly_detector.set_threshold(0.5)
     
     orchestrator.start()
     print(f"\n✓ Pipeline initialized and ready\n")
@@ -86,7 +87,10 @@ def main():
     print(f"\n✓ Normal traffic processing complete:")
     print(f"  Packets processed: {normal_results['normal_traffic']['packets_processed']}")
     print(f"  Anomalies detected: {normal_results['normal_traffic']['anomalies_detected']}")
-    print(f"  → NORMAL: No suspicious activity\n")
+    if normal_results['normal_traffic']['anomalies_detected'] == 0:
+        print(f"  → NORMAL: No suspicious activity\n")
+    else:
+        print(f"  → WARNING: Normal traffic was flagged; check threshold/model calibration\n")
     
     # Step 3: Process attack traffic
     print_section("Step 3: Processing Attack Traffic (Data Exfiltration)")
@@ -113,6 +117,8 @@ def main():
             print(f"    Attack Type: {detection['attack_type']}")
             print(f"    Anomaly Score: {detection['score']:.3f}")
             print(f"    Confidence: {detection['confidence']:.3f}\n")
+    else:
+        print(f"  → WARNING: Attack traffic was not detected\n")
     
     # Step 4: Pipeline status
     print_section("Step 4: Pipeline Status & Metrics")

@@ -189,6 +189,7 @@ class FeatureExtractor:
         
         # Add network features
         feature_vector.update(network_features)
+        feature_vector['P1_STATE'] = sensor_data.get('P1_STATE', 0.0)
         
         return feature_vector
     

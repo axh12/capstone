@@ -113,12 +113,21 @@ class FirewallManager:
         if not rule.rule_id:
             rule.rule_id = f"rule_{self.rule_counter}"
             self.rule_counter += 1
+        elif rule.rule_id in self.rules:
+            rule.rule_id = f"{rule.rule_id}_{self.rule_counter}"
+            self.rule_counter += 1
         
         self.rules[rule.rule_id] = rule
         self._track_blocked_target(rule)
         
         print(f"📋 Added rule {rule.rule_id}: {rule.action} {rule.src_ip or 'any'} -> {rule.dst_ip or 'any'}")
         return rule.rule_id
+
+    def _next_rule_id(self, prefix: str) -> str:
+        """Generate a unique rule ID."""
+        rule_id = f"{prefix}_{self.rule_counter}"
+        self.rule_counter += 1
+        return rule_id
     
     def block_ip(
         self,
@@ -142,7 +151,7 @@ class FirewallManager:
             expiration = datetime.now() + timedelta(seconds=duration_seconds)
         
         rule = FirewallRule(
-            rule_id=f"block_ip_{self.rule_counter}",
+            rule_id=self._next_rule_id("block_ip"),
             action='BLOCK',
             src_ip=ip_address,
             reason=reason or f"Anomaly detected: {ip_address}",
@@ -175,7 +184,7 @@ class FirewallManager:
             expiration = datetime.now() + timedelta(seconds=duration_seconds)
         
         rule = FirewallRule(
-            rule_id=f"block_pair_{self.rule_counter}",
+            rule_id=self._next_rule_id("block_pair"),
             action='BLOCK',
             src_ip=src_ip,
             dst_ip=dst_ip,
@@ -209,7 +218,7 @@ class FirewallManager:
             expiration = datetime.now() + timedelta(seconds=duration_seconds)
         
         rule = FirewallRule(
-            rule_id=f"block_port_{port}_{self.rule_counter}",
+            rule_id=self._next_rule_id(f"block_port_{port}"),
             action='BLOCK',
             port=port,
             protocol=protocol,
@@ -237,7 +246,7 @@ class FirewallManager:
         attack_type = signature.get('attack_type', 'UNKNOWN')
         
         # Block anomalous source IPs
-        for src_ip in signature.get('src_ips', [])[:5]:  # Limit to top 5
+        for src_ip in list(dict.fromkeys(signature.get('src_ips', [])))[:5]:  # Limit to top 5
             rid = self.block_ip(
                 src_ip,
                 reason=f"Attack detected: {attack_type}",
@@ -246,7 +255,7 @@ class FirewallManager:
             rule_ids.append(rid)
         
         # Block anomalous destination IPs
-        for dst_ip in signature.get('dst_ips', [])[:5]:
+        for dst_ip in list(dict.fromkeys(signature.get('dst_ips', [])))[:5]:
             rid = self.block_ip(
                 dst_ip,
                 reason=f"Attack detected: {attack_type}",
@@ -255,7 +264,7 @@ class FirewallManager:
             rule_ids.append(rid)
         
         # Block anomalous ports
-        for port in signature.get('ports', [])[:3]:
+        for port in list(dict.fromkeys(signature.get('ports', [])))[:3]:
             rid = self.block_port(
                 int(port),
                 reason=f"Attack detected: {attack_type}",
@@ -264,7 +273,7 @@ class FirewallManager:
             rule_ids.append(rid)
         
         # Block anomalous IP pairs
-        for pair in signature.get('ip_pairs', [])[:5]:
+        for pair in list(dict.fromkeys(signature.get('ip_pairs', [])))[:5]:
             src, dst = pair.split('_') if '_' in pair else (None, None)
             if src and dst:
                 rid = self.block_ip_pair(
@@ -276,7 +285,7 @@ class FirewallManager:
         
         return rule_ids
     
-    def apply_rules(self) -> Tuple[int, List[str]]:
+    def apply_rules(self, rule_ids: Optional[List[str]] = None) -> Tuple[int, List[str]]:
         """
         Apply active firewall rules.
         
@@ -286,7 +295,13 @@ class FirewallManager:
         errors = []
         applied_count = 0
         
-        for rule_id, rule in self.rules.items():
+        target_rule_ids = rule_ids if rule_ids is not None else list(self.rules.keys())
+
+        for rule_id in target_rule_ids:
+            rule = self.rules.get(rule_id)
+            if rule is None:
+                errors.append(f"Rule {rule_id} not found")
+                continue
             if not rule.active or rule.is_expired():
                 continue
             

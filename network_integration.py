@@ -265,10 +265,11 @@ class SimulatedNetworkSource:
         if attack_type == 'exfiltration':
             # High volume to many destinations
             for i in range(count):
+                ephemeral_port = 40000 + (i % 1000)
                 packet = PacketEvent(
                     src_ip='192.168.1.50',  # Suspicious source
                     dst_ip=f'8.8.8.{i % 256}',  # Many external destinations
-                    src_port=ephemeral_port := 40000 + (i % 1000),
+                    src_port=ephemeral_port,
                     dst_port=443,
                     protocol='tcp',
                     size=1024 + (i % 500),  # Large packets

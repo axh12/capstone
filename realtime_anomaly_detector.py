@@ -62,7 +62,7 @@ class AnomalyDetectionResult:
         """Convert to dictionary for logging."""
         return {
             'timestamp': self.timestamp.isoformat(),
-            'is_anomaly': self.is_anomaly,
+            'is_anomaly': bool(self.is_anomaly),
             'ensemble_score': float(self.ensemble_score),
             'confidence': float(self.confidence),
             'attack_type': self.attack_type
@@ -231,10 +231,17 @@ class RealTimeAnomalyDetector:
         )
         
         # Check sensor anomalies (Attack 2 - Sensor Tampering)
-        sensor_anomalies = sum([
-            1 for sensor in ['AIT504.Pv', 'AIT303.Pv', 'AIT503.Pv', 'AIT502.Pv']
-            if abs(feature_vector.get(sensor, 0)) > 100  # Large deviation
-        ])
+        sensor_ranges = {
+            'AIT504.Pv': (0.0, 2.0),
+            'AIT303.Pv': (25.0, 70.0),
+            'AIT503.Pv': (20.0, 55.0),
+            'AIT502.Pv': (170.0, 220.0),
+        }
+        sensor_anomalies = sum(
+            1
+            for sensor, (low, high) in sensor_ranges.items()
+            if feature_vector.get(sensor, 0) < low or feature_vector.get(sensor, 0) > high
+        )
         
         if network_score > 50 and sensor_anomalies < 2:
             return 'TRAFFIC'

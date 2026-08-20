@@ -26,6 +26,16 @@ from network_integration import NetworkSniffer, SimulatedNetworkSource, PacketEv
 # Add paths to use existing modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Anomaly Detection'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Signature Extraction Module (SEM)'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Digital Twin'))
+
+# Import Digital Twin for emergency response
+try:
+    from physics_engine import PhysicsEngine
+    DIGITAL_TWIN_AVAILABLE = True
+except ImportError:
+    DIGITAL_TWIN_AVAILABLE = False
+    logger = logging.getLogger(__name__)
+    logger.warning("Digital Twin not available - emergency responses disabled")
 
 try:
     from FEATURES_ATTACK2_OPTIMIZED import ATTACK2_OPTIMIZED_FEATURES, SENSOR_FEATURES, NETWORK_FEATURES
@@ -65,7 +75,8 @@ class IntegrationOrchestrator:
         detector_model_path: Optional[str] = None,
         use_real_network: bool = False,
         firewall_enabled: bool = True,
-        dry_run: bool = True
+        dry_run: bool = True,
+        enable_digital_twin: bool = True
     ):
         """
         Initialize the orchestrator.
@@ -75,11 +86,13 @@ class IntegrationOrchestrator:
             use_real_network: True to sniff real network, False for simulation
             firewall_enabled: Enable firewall rule application
             dry_run: Don't actually apply firewall rules
+            enable_digital_twin: Enable Digital Twin emergency response
         """
         self.detector_model_path = detector_model_path
         self.use_real_network = use_real_network
         self.firewall_enabled = firewall_enabled
         self.dry_run = dry_run
+        self.enable_digital_twin = enable_digital_twin
         
         # Initialize components
         self.feature_extractor = FeatureExtractor(window_seconds=5)
@@ -88,6 +101,15 @@ class IntegrationOrchestrator:
             use_iptables=False,  # Use database mode
             dry_run=dry_run
         )
+        
+        # Initialize Digital Twin if available
+        self.digital_twin = None
+        if enable_digital_twin and DIGITAL_TWIN_AVAILABLE:
+            try:
+                self.digital_twin = PhysicsEngine()
+                logger.info("✓ Digital Twin initialized")
+            except Exception as e:
+                logger.warning(f"⚠ Failed to initialize Digital Twin: {e}")
         
         # Network source
         if use_real_network:
@@ -103,12 +125,14 @@ class IntegrationOrchestrator:
             'anomalies_detected': 0,
             'rules_applied': 0,
             'false_positives': 0,
-            'true_positives': 0
+            'true_positives': 0,
+            'emergency_responses': 0
         }
         
         # Detection history
         self.detection_history: List[AnomalyDetectionResult] = []
         self.applied_rules: List[str] = []
+        self.twin_states: List[Dict] = []  # Track twin state changes
         
         logger.info("✓ Integration Orchestrator initialized")
     
@@ -197,18 +221,12 @@ class IntegrationOrchestrator:
             'anomalies_detected': 0,
             'detections': []
         }
+
+        if not packets:
+            return summary
         
-        # Mock sensor data (in real system, would come from PLC/sensors)
-        mock_sensors = {
-            'AIT504.Pv': 500 + (sum(p.size for p in packets) % 100),
-            'PIT501.Pv': 100,
-            'AIT303.Pv': 200,
-            'PIT503.Pv': 150,
-            'DPIT301.Pv': 50,
-            'AIT503.Pv': 300,
-            'AIT502.Pv': 250,
-            'P1_STATE': 1
-        }
+        self.feature_extractor.reset_window()
+        mock_sensors = self._get_mock_sensor_data(packets)
         
         # Add packets to feature extractor
         for packet in packets:
@@ -225,6 +243,7 @@ class IntegrationOrchestrator:
         
         # Run anomaly detection
         detection = self.anomaly_detector.predict(feature_vector)
+        self.detection_history.append(detection)
         
         if detection.is_anomaly:
             summary['anomalies_detected'] += 1
@@ -241,6 +260,7 @@ class IntegrationOrchestrator:
         # Update stats
         self.stats['packets_processed'] += summary['packets_processed']
         self.stats['anomalies_detected'] += summary['anomalies_detected']
+        self.feature_extractor.reset_window()
         
         return summary
     
@@ -263,16 +283,7 @@ class IntegrationOrchestrator:
     def _process_feature_window(self) -> None:
         """Process accumulated features for current window."""
         # Get mock sensors for now (would be real in production)
-        mock_sensors = {
-            'AIT504.Pv': 500,
-            'PIT501.Pv': 100,
-            'AIT303.Pv': 200,
-            'PIT503.Pv': 150,
-            'DPIT301.Pv': 50,
-            'AIT503.Pv': 300,
-            'AIT502.Pv': 250,
-            'P1_STATE': 1
-        }
+        mock_sensors = self._get_mock_sensor_data()
         
         # Extract features
         feature_vector = self.feature_extractor.build_feature_vector(mock_sensors)
@@ -293,6 +304,37 @@ class IntegrationOrchestrator:
         
         # Reset for next window
         self.feature_extractor.reset_window()
+
+    def _get_mock_sensor_data(
+        self,
+        packets: Optional[List[PacketEvent]] = None
+    ) -> Dict[str, float]:
+        """
+        Return baseline-like SWaT sensor values for demos.
+
+        The old demo values were hundreds of units away from the training
+        baseline for conductivity sensors, so every sample looked tampered.
+        """
+        sensors = {
+            'AIT504.Pv': 0.71,
+            'PIT501.Pv': 221.49,
+            'AIT303.Pv': 34.79,
+            'PIT503.Pv': 194.41,
+            'DPIT301.Pv': 14.37,
+            'AIT503.Pv': 30.67,
+            'AIT502.Pv': 191.81,
+            'P1_STATE': 3
+        }
+
+        if packets and any(p.src_ip == '10.0.0.50' for p in packets):
+            sensors.update({
+                'AIT504.Pv': 3.5,
+                'AIT303.Pv': 180.0,
+                'AIT503.Pv': 300.0,
+                'AIT502.Pv': 450.0
+            })
+
+        return sensors
     
     def _handle_anomaly(
         self,
@@ -300,7 +342,10 @@ class IntegrationOrchestrator:
         packets: Optional[List[PacketEvent]] = None
     ) -> None:
         """
-        Handle detected anomaly by extracting signatures and applying firewall rules.
+        Handle detected anomaly by:
+        1. Triggering Digital Twin emergency response
+        2. Extracting signatures
+        3. Applying firewall rules
         
         Args:
             detection: AnomalyDetectionResult object
@@ -308,22 +353,96 @@ class IntegrationOrchestrator:
         """
         logger.warning(f"🚨 Handling anomaly: {detection.attack_type}")
         
-        # Extract signature from anomaly
+        # STEP 1: Trigger Digital Twin Emergency Response
+        if self.digital_twin and self.enable_digital_twin:
+            self._trigger_digital_twin_response(detection)
+        
+        # STEP 2: Extract signature from anomaly
         signature = self._extract_attack_signature(detection, packets)
         
-        # Apply firewall rules
+        # STEP 3: Apply firewall rules
         if self.firewall_enabled:
             rule_ids = self.firewall_manager.extract_rules_from_signature(signature)
             self.applied_rules.extend(rule_ids)
             self.stats['rules_applied'] += len(rule_ids)
             
             # Apply rules
-            applied, errors = self.firewall_manager.apply_rules()
+            applied, errors = self.firewall_manager.apply_rules(rule_ids)
             
             if errors:
                 logger.error(f"Firewall errors: {errors}")
             
             logger.info(f"✓ Applied {applied} firewall rules")
+    
+    def _trigger_digital_twin_response(self, detection: AnomalyDetectionResult) -> None:
+        """
+        Trigger Digital Twin emergency response when anomaly detected.
+        
+        Emergency actions:
+        - TRAFFIC attack: Stop all pumps, open drainage valves
+        - TAMPERING attack: Stop affected processes, isolate system
+        
+        Args:
+            detection: AnomalyDetectionResult object
+        """
+        logger.warning("🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE")
+        
+        try:
+            # Emergency control actions based on attack type
+            if detection.attack_type == 'TRAFFIC':
+                logger.warning("   Attack Type: TRAFFIC (Data Exfiltration)")
+                logger.warning("   Action: Emergency shutdown (stop all pumps)")
+                
+                # Stop all pumps, open drainage
+                emergency_actions = {
+                    'p101': 0,      # Stop pump 1
+                    'p201': 0,      # Stop pump 2
+                    'p301': 0,      # Stop pump 3
+                    'mv101': 1,     # Open valve 1 (drain)
+                    'mv201': 1,     # Open valve 2 (drain)
+                }
+            
+            elif detection.attack_type == 'TAMPERING':
+                logger.warning("   Attack Type: TAMPERING (Sensor Manipulation)")
+                logger.warning("   Action: Isolate affected processes")
+                
+                # Stop process 3 (often targeted), open isolation valves
+                emergency_actions = {
+                    'p301': 0,      # Stop pump 3
+                    'mv201': 1,     # Open isolation valve
+                }
+            
+            else:
+                logger.warning("   Attack Type: UNKNOWN")
+                logger.warning("   Action: Safe state (stop all pumps)")
+                
+                # Conservative: stop everything
+                emergency_actions = {
+                    'p101': 0,
+                    'p201': 0,
+                    'p301': 0,
+                }
+            
+            # Apply emergency actions to Digital Twin
+            self.digital_twin.apply_actions(emergency_actions)
+            twin_state = self.digital_twin.step()
+            
+            self.twin_states.append({
+                'timestamp': datetime.now().isoformat(),
+                'trigger': detection.attack_type,
+                'actions': emergency_actions,
+                'resulting_state': twin_state
+            })
+            
+            self.stats['emergency_responses'] += 1
+            
+            logger.info(f"   ✓ Twin state updated:")
+            logger.info(f"     LIT101={twin_state.get('LIT101', 'N/A'):.1f}")
+            logger.info(f"     LIT201={twin_state.get('LIT201', 'N/A'):.1f}")
+            logger.info(f"     LIT301={twin_state.get('LIT301', 'N/A'):.1f}")
+            
+        except Exception as e:
+            logger.error(f"✗ Digital Twin response error: {e}")
     
     def _extract_attack_signature(
         self,
@@ -372,15 +491,26 @@ class IntegrationOrchestrator:
             'ip_pairs': []
         }
         
+        normal_ranges = {
+            'AIT504.Pv': (0.0, 2.0),
+            'PIT501.Pv': (200.0, 240.0),
+            'AIT303.Pv': (25.0, 70.0),
+            'PIT503.Pv': (180.0, 210.0),
+            'DPIT301.Pv': (0.0, 25.0),
+            'AIT503.Pv': (20.0, 55.0),
+            'AIT502.Pv': (170.0, 220.0),
+        }
+
         # Identify affected sensors (SEM approach: compare to normal baseline)
         for sensor in sensor_list:
             value = features.get(sensor, 0)
-            # Mark as anomalous if significantly outside bounds
-            if abs(value) > 100 or value < 0:  # SWaT sensor value thresholds
+            low, high = normal_ranges.get(sensor, (float('-inf'), float('inf')))
+            if value < low or value > high:
                 signature['affected_sensors'].append(sensor)
                 signature['feature_deviations'][sensor] = {
                     'value': float(value),
-                    'deviation_magnitude': float(abs(value) - 50)  # Approx baseline
+                    'expected_range': [float(low), float(high)],
+                    'deviation_magnitude': float(min(abs(value - low), abs(value - high)))
                 }
         
         # Extract network indicators (SEM style statistical patterns)
@@ -427,10 +557,8 @@ class IntegrationOrchestrator:
     
     def get_recent_detections(self, limit: int = 10) -> List[Dict]:
         """Get recent anomaly detections."""
-        return [
-            d.to_dict()
-            for d in self.detection_history[-limit:]
-        ]
+        anomalies = [d for d in self.detection_history if d.is_anomaly]
+        return [d.to_dict() for d in anomalies[-limit:]]
     
     def export_session_data(self, filepath: str) -> None:
         """Export session data to JSON."""
