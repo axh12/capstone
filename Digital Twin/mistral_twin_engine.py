@@ -9,11 +9,16 @@ from __future__ import annotations
 
 import json
 import time
+import os
+import sys
+from copy import deepcopy
 from typing import Dict, Any
 
 import requests
 
 from physics_engine import PhysicsEngine
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from state_manager import StateValidator
 
 
 class OllamaMistralController:
@@ -106,6 +111,7 @@ class MistralTwinEngine:
     def __init__(self, model: str = "mistral"):
         self.physics = PhysicsEngine()
         self.controller = OllamaMistralController(model=model)
+        self.validator = StateValidator()
 
     def run(self, steps: int = 60, step_sleep_seconds: float = 1.0) -> None:
         available = self.controller.is_available()
@@ -115,9 +121,17 @@ class MistralTwinEngine:
 
         for tick in range(1, steps + 1):
             state = self.physics.snapshot()
+            previous_state = deepcopy(self.physics.state)
             actions = self.controller.propose_actions(state)
             self.physics.apply_actions(actions)
             new_state = self.physics.step()
+            valid, reason = self.validator.validate(new_state)
+            if not valid:
+                # Reject an invalid model transition and restore the prior
+                # snapshot rather than allowing unsafe simulated state.
+                self.physics.state = previous_state
+                print(f"Rejected invalid Mistral state: {reason}; using fallback state")
+                new_state = self.physics.snapshot()
 
             print(
                 f"Tick {tick:03d} | "

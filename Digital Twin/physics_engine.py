@@ -40,6 +40,7 @@ class PlantState:
 @dataclass
 class PhysicsParams:
     dt_seconds: float = 1.0
+    random_seed: int = 0
     tank_area_m2: Dict[str, float] = field(
         default_factory=lambda: {
             "lit101": 2.0,
@@ -60,6 +61,7 @@ class PhysicsEngine:
     def __init__(self, params: PhysicsParams | None = None):
         self.params = params or PhysicsParams()
         self.state = PlantState()
+        self._rng = random.Random(self.params.random_seed)
 
     def apply_actions(self, actions: Dict[str, int]) -> None:
         """Apply binary actuator commands from a controller."""
@@ -73,7 +75,7 @@ class PhysicsEngine:
         dt = self.params.dt_seconds
 
         def noise(scale: float) -> float:
-            return random.uniform(-scale, scale)
+            return self._rng.uniform(-scale, scale)
 
         def level_delta_mm(flow_m3h: float, tank_key: str) -> float:
             volume = (flow_m3h / 3600.0) * dt

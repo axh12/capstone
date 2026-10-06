@@ -1,7 +1,5 @@
-from pymodbus.server import ModbusTcpServer
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
 from pymodbus.device import ModbusDeviceIdentification
-from pymodbus.transaction import ModbusRtuFramer
 
 import random
 import threading

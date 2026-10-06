@@ -14,6 +14,8 @@ import time
 import logging
 import sys
 import os
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List
 from enum import Enum
@@ -21,7 +23,12 @@ from enum import Enum
 from feature_extractor import FeatureExtractor
 from realtime_anomaly_detector import RealTimeAnomalyDetector, AnomalyDetectionResult
 from firewall_manager import FirewallManager, FirewallRule
+from snort_integration import SnortRuleManager
 from network_integration import NetworkSniffer, SimulatedNetworkSource, PacketEvent
+from telemetry import TelemetryEvent
+from state_manager import StateManager
+from decision_engine import DecisionEngine
+from physical_stage1 import NullStage1Connector
 
 # Add paths to use existing modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Anomaly Detection'))
@@ -76,7 +83,12 @@ class IntegrationOrchestrator:
         use_real_network: bool = False,
         firewall_enabled: bool = True,
         dry_run: bool = True,
-        enable_digital_twin: bool = True
+        enable_digital_twin: bool = True,
+        snort_rules_path: Optional[str] = None,
+        snort_blocking: bool = False,
+        snort_apply_command: Optional[str] = None,
+        stage1_connector=None,
+        stage1_sync_interval_seconds: Optional[float] = None,
     ):
         """
         Initialize the orchestrator.
@@ -87,12 +99,29 @@ class IntegrationOrchestrator:
             firewall_enabled: Enable firewall rule application
             dry_run: Don't actually apply firewall rules
             enable_digital_twin: Enable Digital Twin emergency response
+            snort_rules_path: Write generated Snort rules to this path when set
+            snort_blocking: Generate ``drop`` instead of ``alert`` rules
+            snort_apply_command: Optional command to reload Snort; use {rules_file}
         """
         self.detector_model_path = detector_model_path
         self.use_real_network = use_real_network
         self.firewall_enabled = firewall_enabled
         self.dry_run = dry_run
         self.enable_digital_twin = enable_digital_twin
+        self.stage1_connector = stage1_connector or NullStage1Connector()
+        self.stage1_sync_interval_seconds = stage1_sync_interval_seconds
+        self._stage1_stop = threading.Event()
+        self._stage1_thread = None
+        self.state_manager = StateManager()
+        self.decision_engine = DecisionEngine()
+        self.snort_rule_manager = (
+            SnortRuleManager(
+                rules_path=snort_rules_path,
+                blocking=snort_blocking,
+                apply_command=snort_apply_command,
+            )
+            if snort_rules_path else None
+        )
         
         # Initialize components
         self.feature_extractor = FeatureExtractor(window_seconds=5)
@@ -133,6 +162,10 @@ class IntegrationOrchestrator:
         self.detection_history: List[AnomalyDetectionResult] = []
         self.applied_rules: List[str] = []
         self.twin_states: List[Dict] = []  # Track twin state changes
+        self.telemetry_events: List[TelemetryEvent] = []
+        self.decision_history: List[Dict] = []
+        self._previous_process_state: Dict = {}
+        self._window_packets: List[PacketEvent] = []
         
         logger.info("✓ Integration Orchestrator initialized")
     
@@ -148,9 +181,15 @@ class IntegrationOrchestrator:
             
             # Start network source if using real network
             if self.use_real_network:
-                self.network_source.start()
                 self.network_source.register_callback(self._on_packet_received)
+                self.network_source.start()
                 logger.info("✓ Real network sniffer started")
+            if self.stage1_sync_interval_seconds and self.stage1_sync_interval_seconds > 0:
+                self._stage1_stop.clear()
+                self._stage1_thread = threading.Thread(
+                    target=self._stage1_sync_loop, daemon=True, name="stage1-read-only-sync"
+                )
+                self._stage1_thread.start()
             
             logger.info(f"✓ Pipeline started at {self.start_time}")
         
@@ -165,6 +204,10 @@ class IntegrationOrchestrator:
         
         if self.use_real_network:
             self.network_source.stop()
+        self._stage1_stop.set()
+        if self._stage1_thread:
+            self._stage1_thread.join(timeout=2)
+            self._stage1_thread = None
         
         logger.info("✓ Pipeline stopped")
     
@@ -241,9 +284,27 @@ class IntegrationOrchestrator:
         # Extract features
         feature_vector = self.feature_extractor.build_feature_vector(mock_sensors)
         
-        # Run anomaly detection
-        detection = self.anomaly_detector.predict(feature_vector)
+        # Run anomaly detection and SEM candidate extraction concurrently.
+        # Enforcement is still decided only after both futures complete.
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            detection_future = pool.submit(self.anomaly_detector.predict, feature_vector)
+            signature_future = pool.submit(self._extract_candidate_signature, feature_vector, packets)
+            detection = detection_future.result()
+            signature = signature_future.result()
+        signature.update({
+            'timestamp': detection.timestamp.isoformat(),
+            'attack_type': detection.attack_type or 'UNKNOWN',
+            'anomaly_score': detection.ensemble_score,
+        })
         self.detection_history.append(detection)
+        self._record_telemetry(packets, feature_vector, signature)
+        decision = self.decision_engine.decide(detection, signature)
+        self.decision_history.append({
+            'decision': decision.decision.value,
+            'reason': decision.reason,
+            'timestamp': detection.timestamp.isoformat(),
+        })
+        summary['decision'] = decision.decision.value
         
         if detection.is_anomaly:
             summary['anomalies_detected'] += 1
@@ -255,7 +316,7 @@ class IntegrationOrchestrator:
             })
             
             # Extract signatures and apply firewall rules
-            self._handle_anomaly(detection, packets)
+            self._handle_anomaly(detection, packets, signature)
         
         # Update stats
         self.stats['packets_processed'] += summary['packets_processed']
@@ -266,6 +327,7 @@ class IntegrationOrchestrator:
     
     def _on_packet_received(self, packet: PacketEvent) -> None:
         """Called when a packet is received from real network."""
+        self._window_packets.append(packet)
         self.feature_extractor.add_packet({
             'src_ip': packet.src_ip,
             'dst_ip': packet.dst_ip,
@@ -278,19 +340,34 @@ class IntegrationOrchestrator:
         # Check if window is complete
         window_info = self.feature_extractor.get_window_info()
         if window_info['elapsed_seconds'] >= self.feature_extractor.window_seconds:
-            self._process_feature_window()
+            self._process_feature_window(self._window_packets)
     
-    def _process_feature_window(self) -> None:
+    def _process_feature_window(self, packets: Optional[List[PacketEvent]] = None) -> None:
         """Process accumulated features for current window."""
         # Get mock sensors for now (would be real in production)
-        mock_sensors = self._get_mock_sensor_data()
+        mock_sensors = self._get_mock_sensor_data(packets)
         
         # Extract features
         feature_vector = self.feature_extractor.build_feature_vector(mock_sensors)
         
-        # Run anomaly detection
-        detection = self.anomaly_detector.predict(feature_vector)
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            detection_future = pool.submit(self.anomaly_detector.predict, feature_vector)
+            signature_future = pool.submit(self._extract_candidate_signature, feature_vector, packets)
+            detection = detection_future.result()
+            signature = signature_future.result()
+        signature.update({
+            'timestamp': detection.timestamp.isoformat(),
+            'attack_type': detection.attack_type or 'UNKNOWN',
+            'anomaly_score': detection.ensemble_score,
+        })
         self.detection_history.append(detection)
+        self._record_telemetry(packets, feature_vector, signature)
+        decision = self.decision_engine.decide(detection, signature)
+        self.decision_history.append({
+            'decision': decision.decision.value,
+            'reason': decision.reason,
+            'timestamp': detection.timestamp.isoformat(),
+        })
         
         if detection.is_anomaly:
             self.stats['anomalies_detected'] += 1
@@ -300,10 +377,11 @@ class IntegrationOrchestrator:
             )
             
             # Extract signatures and apply rules
-            self._handle_anomaly(detection)
+            self._handle_anomaly(detection, packets=packets, signature=signature)
         
         # Reset for next window
         self.feature_extractor.reset_window()
+        self._window_packets = []
 
     def _get_mock_sensor_data(
         self,
@@ -339,7 +417,8 @@ class IntegrationOrchestrator:
     def _handle_anomaly(
         self,
         detection: AnomalyDetectionResult,
-        packets: Optional[List[PacketEvent]] = None
+        packets: Optional[List[PacketEvent]] = None,
+        signature: Optional[Dict] = None,
     ) -> None:
         """
         Handle detected anomaly by:
@@ -358,9 +437,22 @@ class IntegrationOrchestrator:
             self._trigger_digital_twin_response(detection)
         
         # STEP 2: Extract signature from anomaly
-        signature = self._extract_attack_signature(detection, packets)
+        signature = signature or self._extract_attack_signature(detection, packets)
         
-        # STEP 3: Apply firewall rules
+        # Export command-level Snort rules independently of the optional
+        # local firewall manager.  This keeps Snort automation available even
+        # when IP-based firewall rules are disabled.
+        if self.snort_rule_manager:
+            try:
+                snort_result = self.snort_rule_manager.export_signature(signature)
+                if snort_result['rules']:
+                    logger.info("✓ Snort rules written to %s", snort_result['path'])
+                else:
+                    logger.info("No command signature; no Snort rule generated")
+            except Exception as exc:
+                logger.error("Snort rule export failed: %s", exc)
+
+        # STEP 3: Apply optional local firewall rules
         if self.firewall_enabled:
             rule_ids = self.firewall_manager.extract_rules_from_signature(signature)
             self.applied_rules.extend(rule_ids)
@@ -426,6 +518,7 @@ class IntegrationOrchestrator:
             # Apply emergency actions to Digital Twin
             self.digital_twin.apply_actions(emergency_actions)
             twin_state = self.digital_twin.step()
+            self.state_manager.transition(twin_state)
             
             self.twin_states.append({
                 'timestamp': datetime.now().isoformat(),
@@ -443,6 +536,70 @@ class IntegrationOrchestrator:
             
         except Exception as e:
             logger.error(f"✗ Digital Twin response error: {e}")
+
+    def sync_stage1(self) -> Dict:
+        """Read reference Stage 1 state into the twin; never write to it."""
+        state = self.stage1_connector.read_state()
+        if state:
+            self.state_manager.apply_patch(state)
+        return state
+
+    def _stage1_sync_loop(self) -> None:
+        while not self._stage1_stop.wait(self.stage1_sync_interval_seconds):
+            try:
+                self.sync_stage1()
+            except Exception as exc:
+                logger.warning("Stage 1 read-only synchronization failed: %s", exc)
+
+    def _record_telemetry(self, packets: Optional[List[PacketEvent]],
+                          feature_vector: Dict, signature: Optional[Dict] = None) -> None:
+        """Record the mixed process/network telemetry contract."""
+        network: Dict = {}
+        if packets:
+            first = packets[0]
+            command = (signature or {}).get('modbus_commands', [{}])[0]
+            network = {
+                'src_ip': first.src_ip, 'dst_ip': first.dst_ip,
+                'src_port': first.src_port, 'dst_port': first.dst_port,
+                'protocol': first.protocol, 'packet_size': first.size,
+                'function_code': command.get('function_code', command.get('function')),
+                'register': command.get('register'), 'value': command.get('value'),
+            }
+        process = self.digital_twin.snapshot() if self.digital_twin else {}
+        previous = dict(self._previous_process_state)
+        changes = {
+            key: {'from': previous[key], 'to': value}
+            for key, value in process.items()
+            if key in previous and previous[key] != value
+        }
+        event = TelemetryEvent.create(
+            event_id=f"event-{len(self.telemetry_events) + 1}",
+            network=network,
+            process=process,
+            previous_process=previous,
+            state_change=changes,
+            network_statistics={key: feature_vector.get(key) for key in (
+                'packet_count', 'total_bytes', 'bytes_per_sec', 'packets_per_sec',
+                'unique_src_ips', 'unique_dst_ips', 'unique_ip_pairs',
+                'avg_packet_size', 'max_packet_size', 'packet_size_range',
+                'bytes_per_packet', 'small_packets_count')},
+        )
+        self.telemetry_events.append(event)
+        self._previous_process_state = process
+
+    def _extract_candidate_signature(
+        self, feature_vector: Dict, packets: Optional[List[PacketEvent]] = None
+    ) -> Dict:
+        """Run SEM without waiting for the detector's classification result."""
+        candidate = AnomalyDetectionResult(
+            timestamp=datetime.now(),
+            is_anomaly=False,
+            ensemble_score=0.0,
+            feature_vector=feature_vector,
+            confidence=0.0,
+            attack_type='UNKNOWN',
+        )
+        return self._extract_attack_signature(candidate, packets)
     
     def _extract_attack_signature(
         self,
@@ -488,7 +645,8 @@ class IntegrationOrchestrator:
             'src_ips': [],
             'dst_ips': [],
             'ports': [],
-            'ip_pairs': []
+            'ip_pairs': [],
+            'modbus_commands': []
         }
         
         normal_ranges = {
@@ -537,6 +695,29 @@ class IntegrationOrchestrator:
             signature['ip_pairs'] = [
                 f"{p.src_ip}_{p.dst_ip}" for p in packets[:5]
             ]
+
+            # Decode Modbus/TCP FC06 requests from captured TCP payloads.
+            # MBAP header is 7 bytes; function, register and value follow.
+            for packet in packets:
+                if packet.protocol != 'tcp' or packet.dst_port != 5020 or not packet.raw_data:
+                    continue
+                try:
+                    from scapy.all import IP, Raw
+                    dissected = IP(packet.raw_data)
+                    if not dissected.haslayer(Raw):
+                        continue
+                    payload = bytes(dissected[Raw].load)
+                    if len(payload) >= 12 and payload[2:4] == b'\x00\x00' and payload[7] == 6:
+                        signature['modbus_commands'].append({
+                            'function': 6,
+                            'function_code': 6,
+                            'register': int.from_bytes(payload[8:10], 'big'),
+                            'value': int.from_bytes(payload[10:12], 'big'),
+                            'src_ip': packet.src_ip,
+                            'dst_ip': packet.dst_ip,
+                        })
+                except Exception:
+                    continue
         
         logger.info(f"📋 Extracted signature (SEM format): {json.dumps(signature, indent=2)}")
         return signature
@@ -552,7 +733,9 @@ class IntegrationOrchestrator:
             'uptime_seconds': uptime,
             'statistics': self.stats,
             'firewall_status': self.firewall_manager.get_rule_statistics(),
-            'detection_history_count': len(self.detection_history)
+            'detection_history_count': len(self.detection_history),
+            'telemetry_event_count': len(self.telemetry_events),
+            'decision_count': len(self.decision_history),
         }
     
     def get_recent_detections(self, limit: int = 10) -> List[Dict]:
@@ -567,7 +750,9 @@ class IntegrationOrchestrator:
             'session_end': datetime.now().isoformat(),
             'pipeline_status': self.get_pipeline_status(),
             'recent_detections': self.get_recent_detections(limit=100),
-            'applied_rules': self.applied_rules
+            'applied_rules': self.applied_rules,
+            'telemetry': [event.to_dict() for event in self.telemetry_events[-100:]],
+            'decisions': self.decision_history[-100:],
         }
         
         with open(filepath, 'w') as f:
