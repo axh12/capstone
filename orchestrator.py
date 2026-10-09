@@ -25,7 +25,7 @@ from realtime_anomaly_detector import RealTimeAnomalyDetector, AnomalyDetectionR
 from firewall_manager import FirewallManager, FirewallRule
 from snort_integration import SnortRuleManager
 from network_integration import NetworkSniffer, SimulatedNetworkSource, PacketEvent
-from telemetry import TelemetryEvent
+from telemetry import TelemetryEvent, build_state_change
 from state_manager import StateManager
 from decision_engine import DecisionEngine
 from physical_stage1 import NullStage1Connector
@@ -136,6 +136,9 @@ class IntegrationOrchestrator:
         if enable_digital_twin and DIGITAL_TWIN_AVAILABLE:
             try:
                 self.digital_twin = PhysicsEngine()
+                # Keep the validated State Manager authoritative from the
+                # first Twin snapshot, not only after an emergency action.
+                self.state_manager.transition(self.digital_twin.snapshot())
                 logger.info("✓ Digital Twin initialized")
             except Exception as e:
                 logger.warning(f"⚠ Failed to initialize Digital Twin: {e}")
@@ -269,7 +272,7 @@ class IntegrationOrchestrator:
             return summary
         
         self.feature_extractor.reset_window()
-        mock_sensors = self._get_mock_sensor_data(packets)
+        sensor_data = self._get_sensor_data(packets)
         
         # Add packets to feature extractor
         for packet in packets:
@@ -282,13 +285,14 @@ class IntegrationOrchestrator:
             summary['packets_processed'] += 1
         
         # Extract features
-        feature_vector = self.feature_extractor.build_feature_vector(mock_sensors)
+        feature_vector = self.feature_extractor.build_feature_vector(sensor_data)
+        telemetry = self._build_telemetry_event(packets, feature_vector)
         
         # Run anomaly detection and SEM candidate extraction concurrently.
         # Enforcement is still decided only after both futures complete.
         with ThreadPoolExecutor(max_workers=2) as pool:
             detection_future = pool.submit(self.anomaly_detector.predict, feature_vector)
-            signature_future = pool.submit(self._extract_candidate_signature, feature_vector, packets)
+            signature_future = pool.submit(self._extract_candidate_signature, telemetry, packets)
             detection = detection_future.result()
             signature = signature_future.result()
         signature.update({
@@ -297,7 +301,7 @@ class IntegrationOrchestrator:
             'anomaly_score': detection.ensemble_score,
         })
         self.detection_history.append(detection)
-        self._record_telemetry(packets, feature_vector, signature)
+        self._finalize_telemetry(telemetry, signature)
         decision = self.decision_engine.decide(detection, signature)
         self.decision_history.append({
             'decision': decision.decision.value,
@@ -344,15 +348,16 @@ class IntegrationOrchestrator:
     
     def _process_feature_window(self, packets: Optional[List[PacketEvent]] = None) -> None:
         """Process accumulated features for current window."""
-        # Get mock sensors for now (would be real in production)
-        mock_sensors = self._get_mock_sensor_data(packets)
+        # Build model inputs from the Twin state and compatibility mapping.
+        sensor_data = self._get_sensor_data(packets)
         
         # Extract features
-        feature_vector = self.feature_extractor.build_feature_vector(mock_sensors)
+        feature_vector = self.feature_extractor.build_feature_vector(sensor_data)
+        telemetry = self._build_telemetry_event(packets, feature_vector)
         
         with ThreadPoolExecutor(max_workers=2) as pool:
             detection_future = pool.submit(self.anomaly_detector.predict, feature_vector)
-            signature_future = pool.submit(self._extract_candidate_signature, feature_vector, packets)
+            signature_future = pool.submit(self._extract_candidate_signature, telemetry, packets)
             detection = detection_future.result()
             signature = signature_future.result()
         signature.update({
@@ -361,7 +366,7 @@ class IntegrationOrchestrator:
             'anomaly_score': detection.ensemble_score,
         })
         self.detection_history.append(detection)
-        self._record_telemetry(packets, feature_vector, signature)
+        self._finalize_telemetry(telemetry, signature)
         decision = self.decision_engine.decide(detection, signature)
         self.decision_history.append({
             'decision': decision.decision.value,
@@ -383,15 +388,17 @@ class IntegrationOrchestrator:
         self.feature_extractor.reset_window()
         self._window_packets = []
 
-    def _get_mock_sensor_data(
+    def _get_sensor_data(
         self,
         packets: Optional[List[PacketEvent]] = None
     ) -> Dict[str, float]:
         """
-        Return baseline-like SWaT sensor values for demos.
+        Build detector sensor inputs from the Twin's authoritative state.
 
-        The old demo values were hundreds of units away from the training
-        baseline for conductivity sensors, so every sample looked tampered.
+        The current physics model and the trained anomaly model use different
+        sensor names.  Until an explicit physical-to-model mapping is supplied,
+        baseline values remain as a documented compatibility fallback.  Any
+        Twin field whose name is already a model feature takes precedence.
         """
         sensors = {
             'AIT504.Pv': 0.71,
@@ -403,6 +410,14 @@ class IntegrationOrchestrator:
             'AIT502.Pv': 191.81,
             'P1_STATE': 3
         }
+
+        twin_state = self.state_manager.snapshot()
+        if not twin_state and self.digital_twin:
+            twin_state = self.digital_twin.snapshot()
+        sensors.update({
+            name: value for name, value in twin_state.items()
+            if name in sensors
+        })
 
         if packets and any(p.src_ip == '10.0.0.50' for p in packets):
             sensors.update({
@@ -551,34 +566,39 @@ class IntegrationOrchestrator:
             except Exception as exc:
                 logger.warning("Stage 1 read-only synchronization failed: %s", exc)
 
-    def _record_telemetry(self, packets: Optional[List[PacketEvent]],
-                          feature_vector: Dict, signature: Optional[Dict] = None) -> None:
-        """Record the mixed process/network telemetry contract."""
+    def _build_telemetry_event(
+        self, packets: Optional[List[PacketEvent]], feature_vector: Dict
+    ) -> TelemetryEvent:
+        """Create the single telemetry contract shared by AD and SEM."""
         network: Dict = {}
         if packets:
             first = packets[0]
-            command = (signature or {}).get('modbus_commands', [{}])[0]
             network = {
                 'src_ip': first.src_ip, 'dst_ip': first.dst_ip,
                 'src_port': first.src_port, 'dst_port': first.dst_port,
                 'protocol': first.protocol, 'packet_size': first.size,
-                'function_code': command.get('function_code', command.get('function')),
-                'register': command.get('register'), 'value': command.get('value'),
             }
-        process = self.digital_twin.snapshot() if self.digital_twin else {}
+        process = self.state_manager.snapshot()
+        if not process and self.digital_twin:
+            process = self.digital_twin.snapshot()
+        # Preserve the Twin's native state and include the model-facing sensor
+        # values in the same event.  This is the explicit bridge while their
+        # naming schemes differ.
+        model_sensors = SENSOR_FEATURES if FEATURES_AVAILABLE else [
+            'AIT504.Pv', 'PIT501.Pv', 'AIT303.Pv', 'PIT503.Pv',
+            'DPIT301.Pv', 'AIT503.Pv', 'AIT502.Pv'
+        ]
+        for name in [*model_sensors, 'P1_STATE']:
+            if name in feature_vector:
+                process.setdefault(name, feature_vector[name])
         previous = dict(self._previous_process_state)
-        changes = {
-            key: {'from': previous[key], 'to': value}
-            for key, value in process.items()
-            if key in previous and previous[key] != value
-        }
         event = TelemetryEvent.create(
             event_id=f"event-{len(self.telemetry_events) + 1}",
             network=network,
             process=process,
             previous_process=previous,
-            state_change=changes,
-            network_statistics={key: feature_vector.get(key) for key in (
+            state_change=build_state_change(previous, process),
+            network_statistics={key: feature_vector.get(key, 0) for key in (
                 'packet_count', 'total_bytes', 'bytes_per_sec', 'packets_per_sec',
                 'unique_src_ips', 'unique_dst_ips', 'unique_ip_pairs',
                 'avg_packet_size', 'max_packet_size', 'packet_size_range',
@@ -587,10 +607,31 @@ class IntegrationOrchestrator:
         self.telemetry_events.append(event)
         self._previous_process_state = process
 
+        return event
+
+    def _finalize_telemetry(self, event: TelemetryEvent, signature: Dict) -> None:
+        """Add decoded Modbus context after SEM has examined the packet window."""
+        command = signature.get('modbus_commands', [{}])[0]
+        if command:
+            event.network.update({
+                'function_code': command.get('function_code', command.get('function')),
+                'register': command.get('register'),
+                'value': command.get('value'),
+            })
+
     def _extract_candidate_signature(
-        self, feature_vector: Dict, packets: Optional[List[PacketEvent]] = None
+        self, telemetry: TelemetryEvent, packets: Optional[List[PacketEvent]] = None
     ) -> Dict:
-        """Run SEM without waiting for the detector's classification result."""
+        """Run SEM from shared Twin telemetry without waiting for AD's result."""
+        sensor_list = SENSOR_FEATURES if FEATURES_AVAILABLE else [
+            'AIT504.Pv', 'PIT501.Pv', 'AIT303.Pv', 'PIT503.Pv',
+            'DPIT301.Pv', 'AIT503.Pv', 'AIT502.Pv'
+        ]
+        feature_vector = dict(telemetry.network_statistics)
+        feature_vector.update({
+            name: value for name, value in telemetry.process.items()
+            if name in sensor_list or name == 'P1_STATE'
+        })
         candidate = AnomalyDetectionResult(
             timestamp=datetime.now(),
             is_anomaly=False,
