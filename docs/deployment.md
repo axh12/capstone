@@ -30,7 +30,6 @@ Contains:
     - Modbus server
     - State Manager
     - Physics Engine
-    - Mistral/Ollama
     - Telemetry
     - Anomaly Detection
     - SEM

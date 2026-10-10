@@ -1,14 +1,11 @@
 # Architecture Decision Log
 
-## ADR-001 — Hybrid Physics + Mistral
+## ADR-001 — Deterministic Physics Engine
 
 Status: Accepted
 
-Physics Engine provides deterministic physical behavior.
-
-Mistral provides complex state interactions and realistic simulation.
-
-Physics Engine is fallback.
+The Physics Engine provides deterministic physical behavior and is the sole
+Digital Twin simulation engine. External AI services are not required.
 
 ---
 

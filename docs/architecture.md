@@ -38,8 +38,6 @@ Digital Twin
     |
     +--> Physics Engine
     |
-    +--> Mistral Engine
-    |
     +--> State Validator
     |
     v
@@ -145,34 +143,11 @@ It models:
 - sensor relationships
 - physical constraints
 
-It also acts as the fallback engine when Ollama/Mistral is unavailable.
+It is the sole simulation engine for the Digital Twin.
 
 ---
 
-# 7. Mistral Engine
-
-Mistral enhances the physical simulation.
-
-Responsibilities may include:
-
-- complex coupled state transitions
-- simultaneous actuator interactions
-- temporal behavior
-- realistic process behavior
-- realistic sensor behavior
-- noise
-
-Mistral does not have unrestricted authority over the physical state.
-
-Its output is validated.
-
-Invalid output is rejected.
-
-If Ollama fails, Physics Engine is used.
-
----
-
-# 8. Telemetry
+# 7. Telemetry
 
 Telemetry contains:
 

@@ -30,59 +30,47 @@ The Digital Twin shall periodically read state from the physical Stage 1.
 
 Commands received from external clients shall never directly control the physical Stage 1.
 
-### FR-07 Mistral
-
-The Digital Twin shall support an Ollama-hosted Mistral simulation engine.
-
-### FR-08 Fallback
-
-The Physics Engine shall automatically operate when Mistral/Ollama is unavailable or invalid.
-
-### FR-09 Validation
-
-Mistral-generated state shall be validated against physical constraints.
-
-### FR-10 Telemetry
+### FR-07 Telemetry
 
 The Digital Twin shall produce structured telemetry for every relevant interaction/state transition.
 
-### FR-11 Mixed Features
+### FR-08 Mixed Features
 
 Telemetry shall support both process/sensor and network features required by the anomaly detector.
 
-### FR-12 Anomaly Detection
+### FR-09 Anomaly Detection
 
 The system shall perform runtime anomaly detection using the trained model.
 
-### FR-13 SEM
+### FR-10 SEM
 
 SEM shall generate a candidate behavioral signature.
 
-### FR-14 Rule Generation
+### FR-11 Rule Generation
 
 The Rule Generator shall convert a candidate signature into an enforceable Snort rule.
 
-### FR-15 Parallel Processing
+### FR-12 Parallel Processing
 
 SEM/rule generation and anomaly detection shall execute concurrently.
 
-### FR-16 Decision
+### FR-13 Decision
 
 The system shall wait for anomaly detection before deciding whether to activate the candidate rule.
 
-### FR-17 Normal Traffic
+### FR-14 Normal Traffic
 
 Normal traffic shall result in the candidate rule being discarded and permitted traffic being forwarded.
 
-### FR-18 Malicious Traffic
+### FR-15 Malicious Traffic
 
 Anomalous traffic shall be blocked and shall not reach Main SCADA.
 
-### FR-19 IPS
+### FR-16 IPS
 
 Validated rules shall be deployed to Snort IPS on pfSense.
 
-### FR-20 Subsequent Traffic
+### FR-17 Subsequent Traffic
 
 Once a rule is active, subsequent matching traffic shall be blocked by the IPS.
 
@@ -92,7 +80,7 @@ Once a rule is active, subsequent matching traffic shall be blocked by the IPS.
 
 ## NFR-01 Reliability
 
-The Digital Twin shall continue operating when Mistral is unavailable.
+The Physics Engine shall operate independently without external AI services.
 
 ## NFR-02 Modularity
 
