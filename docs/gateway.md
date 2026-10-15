@@ -246,9 +246,18 @@ lab use. Other functions and unmapped registers return Modbus exceptions.
 Requests are serialized across clients to preserve state/feature ordering;
 the simulation advances once per accepted write, not on a background clock.
 
-Generated Snort rules are written to the configured file. The gateway does
-not deploy or reload pfSense. Subsequent packets are still classified by the
-gateway until actual IPS deployment is configured and verified.
+Generated Snort rules are written to the configured file. The generic gateway
+does not deploy or reload pfSense unless deployment is explicitly configured.
+The pfSense SSH helper merges each new generated rule into the saved
+Capstone-managed section, deduplicating by SID. Existing managed rules survive
+gateway restarts and later deployments; an empty rule file is a no-op. To
+intentionally remove only those rules, run the deployment script with
+--config pfsense-deployment.json --clear-managed. Do not run that command
+between accumulation tests. A rule already installed in inline Snort can stop
+its matching request before the gateway sees it, so use a new FC06
+register/value signature when testing detector discovery again. The current
+gateway only supports the mapped registers above, not arbitrary register
+ranges.
 
 Models must use calibrated scoring, match the installed sklearn version,
 and have a supported feature profile. The historical full-SWaT artifact is

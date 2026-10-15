@@ -25,6 +25,19 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(payload['mode'], 'legacy')
         self.assertTrue(payload['rules'][0].startswith('alert tcp any any'))
 
+    def test_empty_rule_file_is_an_additive_noop(self):
+        self.manager.rules_path.write_text('')
+        with patch.object(self.deployer, 'request', return_value={'ok':True}) as request:
+            self.deployer.deploy(self.manager.rules_path)
+        self.assertEqual(request.call_args.args[0]['operation'], 'apply')
+        self.assertEqual(request.call_args.args[0]['rules'], [])
+
+    def test_clearing_requires_separate_explicit_operation(self):
+        with patch.object(self.deployer, 'request', return_value={'ok':True}) as request:
+            self.deployer.clear_managed()
+        self.assertEqual(request.call_args.args[0], {
+            'operation':'clear_managed','interface':'wan','mode':'legacy','rules':[]})
+
     def test_ip_only_rule_refused_before_contacting_pfsense(self):
         self.manager.rules_path.write_text('alert tcp 192.0.2.2 any -> any 5020 (sid:1;)\n')
         with patch.object(self.deployer, 'request') as request, self.assertRaises(ValueError):

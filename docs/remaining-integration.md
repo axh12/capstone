@@ -142,7 +142,9 @@ before Ubuntu. Then send an unrelated normal command from the same Kali IP
 and prove it reaches mock SCADA. Save packet captures and Snort logs.
 
 Do not claim command-specific inline enforcement from the earlier host-block
-test. Runtime cleanup currently redeploys rule expiration only during new
-anomaly exports; idle-time expiry and concurrent GUI edits during deployment
-require further lifecycle work. Avoid editing the same custom-rule instance
-in the GUI while the deployment helper is applying a change.
+test. Saved Capstone-managed pfSense rules now accumulate across deployments
+and gateway restarts. The local rule manager's expiration only prunes its
+temporary in-memory/file set; it does not remove rules saved on pfSense.
+Removal requires an explicit managed-rule clear. Avoid editing the same
+custom-rule instance in the GUI while the deployment helper is applying a
+change.

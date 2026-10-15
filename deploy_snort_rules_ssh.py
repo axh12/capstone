@@ -68,6 +68,11 @@ class SSHRuleDeployer:
     def inspect(self):
         return self.request({"operation": "inspect", "interface": self.interface})
 
+    def clear_managed(self):
+        """Explicitly remove only the Capstone-managed Snort rules."""
+        return self.request({"operation": "clear_managed", "interface": self.interface,
+                             "mode": self.mode, "rules": []})
+
     def deploy(self, path):
         rules = [line.strip() for line in Path(path).read_text().splitlines()
                  if line.strip() and not line.lstrip().startswith("#")]
@@ -100,13 +105,17 @@ def configure_deployment(pipeline, config_file):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
-    parser.add_argument("--inspect", action="store_true")
-    parser.add_argument("--rules", type=Path)
+    action = parser.add_mutually_exclusive_group(required=True)
+    action.add_argument("--inspect", action="store_true")
+    action.add_argument("--rules", type=Path, help="Add generated rules without removing earlier managed rules")
+    action.add_argument("--clear-managed", action="store_true",
+                        help="Explicitly remove all Capstone-managed rules")
     args = parser.parse_args()
     deployer = SSHRuleDeployer(json.loads(Path(args.config).read_text()))
-    if not args.inspect and args.rules is None:
-        parser.error("--rules or --inspect is required")
-    print(json.dumps(deployer.inspect() if args.inspect else deployer.deploy(args.rules), indent=2))
+    result = (deployer.inspect() if args.inspect else
+              deployer.clear_managed() if args.clear_managed else
+              deployer.deploy(args.rules))
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

@@ -56,9 +56,9 @@ function snort_reload_config($instance) { global $reloads; $reloads++; file_put_
             saved=json.loads((root/'saved.json').read_text()) if (root/'saved.json').exists() else None
             return result, generated, saved, completed.returncode
 
-    def rule(self, blocking=False):
+    def rule(self, blocking=False, register=20):
         return SnortRuleManager(blocking=blocking).rules_from_signature(
-            {'modbus_commands':[{'function':6,'register':20,'value':1}]})[0]
+            {'modbus_commands':[{'function':6,'register':register,'value':1}]})[0]
 
     def payload(self, blocking=False):
         return {'operation':'apply','interface':'wan','mode':'inline' if blocking else 'legacy',
@@ -110,12 +110,51 @@ function snort_reload_config($instance) { global $reloads; $reloads++; file_put_
         self.assertEqual(base64.b64decode(saved[0]['customrules']).decode(),existing)
         self.assertIsNone(result['rollback_error'])
 
-    def test_existing_managed_section_replaced_without_duplicates(self):
+    def test_existing_managed_rule_is_not_duplicated(self):
         existing='# outside\n# BEGIN CAPSTONE MANAGED\n'+self.rule()+'\n# END CAPSTONE MANAGED\n'
         result,generated,_,code=self.run_helper(self.payload(),existing)
         self.assertEqual(code,0)
         self.assertFalse(result['changed'])
         self.assertIsNone(generated)
+
+    def test_new_rule_accumulates_with_rule_from_previous_run(self):
+        old_rule=self.rule(blocking=True,register=20)
+        new_rule=self.rule(blocking=True,register=23)
+        existing='# outside\n# BEGIN CAPSTONE MANAGED\n'+old_rule+'\n# END CAPSTONE MANAGED\n'
+        payload={'operation':'apply','interface':'wan','mode':'inline','rules':[new_rule]}
+        result,generated,_,code=self.run_helper(payload,existing,mode='inline')
+        self.assertEqual(code,0)
+        self.assertEqual(result['rules'],2)
+        self.assertEqual(generated.count(old_rule),1)
+        self.assertEqual(generated.count(new_rule),1)
+        self.assertIn('# outside',generated)
+
+    def test_empty_apply_cannot_clear_persisted_rules(self):
+        existing='# BEGIN CAPSTONE MANAGED\n'+self.rule()+'\n# END CAPSTONE MANAGED\n'
+        payload={'operation':'apply','interface':'wan','mode':'legacy','rules':[]}
+        result,generated,saved,code=self.run_helper(payload,existing)
+        self.assertEqual(code,0)
+        self.assertFalse(result['changed'])
+        self.assertIsNone(generated)
+        self.assertIsNone(saved)
+
+    def test_explicit_clear_removes_only_managed_rules(self):
+        existing='# outside\n# BEGIN CAPSTONE MANAGED\n'+self.rule()+'\n# END CAPSTONE MANAGED\n'
+        payload={'operation':'clear_managed','interface':'wan','mode':'legacy','rules':[]}
+        result,generated,_,code=self.run_helper(payload,existing)
+        self.assertEqual(code,0)
+        self.assertEqual(result['rules'],0)
+        self.assertIn('# outside',generated)
+        self.assertNotIn(self.rule(),generated)
+        self.assertIn('# BEGIN CAPSTONE MANAGED\n\n# END CAPSTONE MANAGED',generated)
+
+    def test_clear_refuses_attached_rules(self):
+        payload={'operation':'clear_managed','interface':'wan','mode':'legacy',
+                 'rules':[self.rule()]}
+        result,_,saved,code=self.run_helper(payload)
+        self.assertEqual(code,1)
+        self.assertIn('cannot include rules',result['error'])
+        self.assertIsNone(saved)
 
     def test_inline_accepts_drop_rule(self):
         result,generated,_,code=self.run_helper(self.payload(True),mode='inline')

@@ -259,7 +259,11 @@ dt-venv/bin/python run_mock_lab.py --listen-host 192.168.58.105 \
 Telemetry records `ensemble_score`, `ensemble_only_score`, `threshold`,
 `detection_basis`, the allow/block decision and enforcement outcome. Supply
 `--deployment-config pfsense-deployment.json` only after independent accuracy
-review and after clearing old Capstone-managed test rules, so a prior Snort
-drop cannot masquerade as new detection. Compare the first request's gateway
-decision, SEM signature and deployment result with the repeated request's
-pfSense alert and the mock SCADA receipt log.
+review. Capstone-managed pfSense rules persist across gateway restarts and
+new deployments add distinct command rules without deleting earlier ones.
+Inspect the managed section before each experiment: a command with an existing
+rule will be stopped by Snort before it can test the detector again. Use a new
+command signature for an accumulation test; clear rules only when an isolated
+baseline is explicitly required. Compare the first request's gateway decision,
+SEM signature and deployment result with the repeated request's pfSense alert
+and the mock SCADA receipt log.
