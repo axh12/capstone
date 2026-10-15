@@ -18,7 +18,7 @@ Kali must not run project detection components.
 
 ---
 
-### Debian VM
+### Ubuntu VM
 
 Role:
 
@@ -50,7 +50,7 @@ Contains:
     - routing
     - Snort IPS
 
-pfSense is managed/accessed through its web interface from Debian where required.
+pfSense is managed/accessed through its web interface from Ubuntu where required.
 
 ---
 
@@ -63,7 +63,7 @@ Kali
 pfSense
   |
   v
-Debian Digital Twin
+Ubuntu Digital Twin
   |
   | permitted traffic
   v
@@ -73,7 +73,7 @@ Physical Stage 1
   |
   | periodic read-only state synchronization
   v
-Debian Digital Twin
+Ubuntu Digital Twin
 
 ---
 

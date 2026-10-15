@@ -15,6 +15,8 @@ import logging
 import sys
 import os
 import threading
+import math
+from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List
@@ -89,6 +91,8 @@ class IntegrationOrchestrator:
         snort_apply_command: Optional[str] = None,
         stage1_connector=None,
         stage1_sync_interval_seconds: Optional[float] = None,
+        use_actuator_support: bool = True,
+        physics_params=None,
     ):
         """
         Initialize the orchestrator.
@@ -109,6 +113,7 @@ class IntegrationOrchestrator:
         self.dry_run = dry_run
         self.enable_digital_twin = enable_digital_twin
         self.stage1_connector = stage1_connector or NullStage1Connector()
+        self._twin_lock = threading.RLock()
         self.stage1_sync_interval_seconds = stage1_sync_interval_seconds
         self._stage1_stop = threading.Event()
         self._stage1_thread = None
@@ -125,7 +130,10 @@ class IntegrationOrchestrator:
         
         # Initialize components
         self.feature_extractor = FeatureExtractor(window_seconds=5)
-        self.anomaly_detector = RealTimeAnomalyDetector(model_path=detector_model_path)
+        self.anomaly_detector = RealTimeAnomalyDetector(
+            model_path=detector_model_path,
+            use_actuator_support=use_actuator_support,
+        )
         self.firewall_manager = FirewallManager(
             use_iptables=False,  # Use database mode
             dry_run=dry_run
@@ -135,7 +143,7 @@ class IntegrationOrchestrator:
         self.digital_twin = None
         if enable_digital_twin and DIGITAL_TWIN_AVAILABLE:
             try:
-                self.digital_twin = PhysicsEngine()
+                self.digital_twin = PhysicsEngine(physics_params)
                 # Keep the validated State Manager authoritative from the
                 # first Twin snapshot, not only after an emergency action.
                 self.state_manager.transition(self.digital_twin.snapshot())
@@ -167,6 +175,7 @@ class IntegrationOrchestrator:
         self.twin_states: List[Dict] = []  # Track twin state changes
         self.telemetry_events: List[TelemetryEvent] = []
         self.decision_history: List[Dict] = []
+        self.enforcement_history: List[Dict] = []
         self._previous_process_state: Dict = {}
         self._window_packets: List[PacketEvent] = []
         
@@ -252,7 +261,9 @@ class IntegrationOrchestrator:
         
         return results
     
-    def _process_packet_batch(self, packets: List[PacketEvent]) -> Dict:
+    def _process_packet_batch(self, packets: List[PacketEvent],
+                              intervention_context: Optional[Dict] = None,
+                              new_packet_count: Optional[int] = None) -> Dict:
         """
         Process a batch of packets.
         
@@ -282,16 +293,24 @@ class IntegrationOrchestrator:
                 'size': packet.size,
                 'timestamp': packet.timestamp
             })
-            summary['packets_processed'] += 1
+        summary['packets_processed'] = (len(packets) if new_packet_count is None
+                                        else new_packet_count)
         
         # Extract features
         feature_vector = self.feature_extractor.build_feature_vector(sensor_data)
+        for name in [*(SENSOR_FEATURES if FEATURES_AVAILABLE else []), 'P1_STATE']:
+            if name not in sensor_data:
+                feature_vector.pop(name, None)
+        feature_vector.update(self.state_manager.snapshot())
+        feature_vector.update(self._command_features(packets))
         telemetry = self._build_telemetry_event(packets, feature_vector)
         
         # Run anomaly detection and SEM candidate extraction concurrently.
         # Enforcement is still decided only after both futures complete.
         with ThreadPoolExecutor(max_workers=2) as pool:
             detection_future = pool.submit(self.anomaly_detector.predict, feature_vector)
+            # SEM summarizes the same batch. Only its current request may
+            # receive a command-specific rule from this inline decision.
             signature_future = pool.submit(self._extract_candidate_signature, telemetry, packets)
             detection = detection_future.result()
             signature = signature_future.result()
@@ -299,16 +318,49 @@ class IntegrationOrchestrator:
             'timestamp': detection.timestamp.isoformat(),
             'attack_type': detection.attack_type or 'UNKNOWN',
             'anomaly_score': detection.ensemble_score,
+            'feature_deviations': getattr(detection, 'feature_deviations', {}),
         })
+        self._attribute_process_novelty(signature)
+        new_attributed_rule = False
+        actionable = None
+        if intervention_context is not None:
+            alternative_score = intervention_context['alternative_score']
+            known_blocked = intervention_context['known_blocked']
+            threshold = getattr(detection, 'threshold', self.anomaly_detector.threshold)
+            new_attributed_rule = (detection.is_anomaly and not known_blocked
+                                   and alternative_score <= threshold)
+            actionable = bool(new_attributed_rule or known_blocked)
+            if not new_attributed_rule:
+                signature['modbus_commands'] = []
+            signature['rule_attribution'] = (
+                'model counterfactual crosses threshold for this actuator'
+                if new_attributed_rule else
+                'previously quarantined command; existing rule' if known_blocked else
+                'no process anomaly; no command rule' if not detection.is_anomaly else
+                'alternative actuator state is also anomalous; no command rule')
+        else:
+            self._suppress_rule_for_persistent_state_anomaly(signature, detection)
+        telemetry.detection = detection.to_dict()
+        telemetry.detection['threshold'] = getattr(detection, 'threshold', None)
+        telemetry.detection['feature_deviations'] = signature['feature_deviations']
+        telemetry.detection['rule_attribution'] = signature.get('rule_attribution')
+        telemetry.detection['window_command_counts'] = signature.get('window_command_counts', [])
+        if intervention_context is not None:
+            telemetry.detection['alternative_score'] = alternative_score
+            telemetry.detection['actionable_command'] = actionable
+        logger.info('Final AD/SEM result: %s', json.dumps(signature))
         self.detection_history.append(detection)
         self._finalize_telemetry(telemetry, signature)
-        decision = self.decision_engine.decide(detection, signature)
+        decision = self.decision_engine.decide(detection, signature,
+                                              actionable=actionable)
         self.decision_history.append({
             'decision': decision.decision.value,
             'reason': decision.reason,
             'timestamp': detection.timestamp.isoformat(),
         })
         summary['decision'] = decision.decision.value
+        summary['new_attributed_rule'] = new_attributed_rule
+        summary['detection'] = detection
         
         if detection.is_anomaly:
             summary['anomalies_detected'] += 1
@@ -319,8 +371,11 @@ class IntegrationOrchestrator:
                 'confidence': detection.confidence
             })
             
-            # Extract signatures and apply firewall rules
-            self._handle_anomaly(detection, packets, signature)
+            # Keep a persistent process alarm distinct from an attributable
+            # command. The gateway handles Twin recovery after rollback.
+            if intervention_context is None or new_attributed_rule:
+                self._handle_anomaly(detection, packets, signature,
+                                     trigger_twin_response=intervention_context is None)
         
         # Update stats
         self.stats['packets_processed'] += summary['packets_processed']
@@ -353,6 +408,11 @@ class IntegrationOrchestrator:
         
         # Extract features
         feature_vector = self.feature_extractor.build_feature_vector(sensor_data)
+        for name in [*(SENSOR_FEATURES if FEATURES_AVAILABLE else []), 'P1_STATE']:
+            if name not in sensor_data:
+                feature_vector.pop(name, None)
+        feature_vector.update(self.state_manager.snapshot())
+        feature_vector.update(self._command_features(packets))
         telemetry = self._build_telemetry_event(packets, feature_vector)
         
         with ThreadPoolExecutor(max_workers=2) as pool:
@@ -364,7 +424,15 @@ class IntegrationOrchestrator:
             'timestamp': detection.timestamp.isoformat(),
             'attack_type': detection.attack_type or 'UNKNOWN',
             'anomaly_score': detection.ensemble_score,
+            'feature_deviations': getattr(detection, 'feature_deviations', {}),
         })
+        self._attribute_process_novelty(signature)
+        self._suppress_rule_for_persistent_state_anomaly(signature, detection)
+        telemetry.detection = detection.to_dict()
+        telemetry.detection['threshold'] = getattr(detection, 'threshold', None)
+        telemetry.detection['feature_deviations'] = signature['feature_deviations']
+        telemetry.detection['rule_attribution'] = signature.get('rule_attribution')
+        logger.info('Final AD/SEM result: %s', json.dumps(signature))
         self.detection_history.append(detection)
         self._finalize_telemetry(telemetry, signature)
         decision = self.decision_engine.decide(detection, signature)
@@ -395,45 +463,32 @@ class IntegrationOrchestrator:
         """
         Build detector sensor inputs from the Twin's authoritative state.
 
-        The current physics model and the trained anomaly model use different
-        sensor names.  Until an explicit physical-to-model mapping is supplied,
-        baseline values remain as a documented compatibility fallback.  Any
-        Twin field whose name is already a model feature takes precedence.
+        Only observed values with matching names are supplied. AIT/pressure
+        features from other SWaT stages cannot be invented from tank levels.
         """
-        sensors = {
-            'AIT504.Pv': 0.71,
-            'PIT501.Pv': 221.49,
-            'AIT303.Pv': 34.79,
-            'PIT503.Pv': 194.41,
-            'DPIT301.Pv': 14.37,
-            'AIT503.Pv': 30.67,
-            'AIT502.Pv': 191.81,
-            'P1_STATE': 3
-        }
-
         twin_state = self.state_manager.snapshot()
         if not twin_state and self.digital_twin:
             twin_state = self.digital_twin.snapshot()
-        sensors.update({
-            name: value for name, value in twin_state.items()
-            if name in sensors
-        })
+        return {name: value for name, value in twin_state.items()
+                if name in [*SENSOR_FEATURES, 'P1_STATE']} if FEATURES_AVAILABLE else {}
 
-        if packets and any(p.src_ip == '10.0.0.50' for p in packets):
-            sensors.update({
-                'AIT504.Pv': 3.5,
-                'AIT303.Pv': 180.0,
-                'AIT503.Pv': 300.0,
-                'AIT502.Pv': 450.0
-            })
-
-        return sensors
+    @staticmethod
+    def _command_features(packets):
+        features = {'modbus_function': 0, 'modbus_register': 0, 'modbus_value': 0}
+        if packets:
+            payload = getattr(packets[-1], 'modbus_payload', None)
+            if payload and len(payload) == 12:
+                features.update(modbus_function=payload[7],
+                    modbus_register=int.from_bytes(payload[8:10], 'big'),
+                    modbus_value=int.from_bytes(payload[10:12], 'big'))
+        return features
     
     def _handle_anomaly(
         self,
         detection: AnomalyDetectionResult,
         packets: Optional[List[PacketEvent]] = None,
         signature: Optional[Dict] = None,
+        trigger_twin_response: bool = True,
     ) -> None:
         """
         Handle detected anomaly by:
@@ -448,7 +503,7 @@ class IntegrationOrchestrator:
         logger.warning(f"🚨 Handling anomaly: {detection.attack_type}")
         
         # STEP 1: Trigger Digital Twin Emergency Response
-        if self.digital_twin and self.enable_digital_twin:
+        if trigger_twin_response and self.digital_twin and self.enable_digital_twin:
             self._trigger_digital_twin_response(detection)
         
         # STEP 2: Extract signature from anomaly
@@ -460,11 +515,13 @@ class IntegrationOrchestrator:
         if self.snort_rule_manager:
             try:
                 snort_result = self.snort_rule_manager.export_signature(signature)
+                self.enforcement_history.append(snort_result)
                 if snort_result['rules']:
                     logger.info("✓ Snort rules written to %s", snort_result['path'])
                 else:
                     logger.info("No command signature; no Snort rule generated")
             except Exception as exc:
+                self.enforcement_history.append({'applied': False, 'error': str(exc)})
                 logger.error("Snort rule export failed: %s", exc)
 
         # STEP 3: Apply optional local firewall rules
@@ -503,6 +560,7 @@ class IntegrationOrchestrator:
                 # Stop all pumps, open drainage
                 emergency_actions = {
                     'p101': 0,      # Stop pump 1
+                    'p203': 0,      # Stop dosing pump
                     'p201': 0,      # Stop pump 2
                     'p301': 0,      # Stop pump 3
                     'mv101': 1,     # Open valve 1 (drain)
@@ -527,6 +585,7 @@ class IntegrationOrchestrator:
                 emergency_actions = {
                     'p101': 0,
                     'p201': 0,
+                    'p203': 0,
                     'p301': 0,
                 }
             
@@ -556,7 +615,24 @@ class IntegrationOrchestrator:
         """Read reference Stage 1 state into the twin; never write to it."""
         state = self.stage1_connector.read_state()
         if state:
-            self.state_manager.apply_patch(state)
+            with self._twin_lock:
+                if self.digital_twin is None:
+                    self.state_manager.apply_patch(state)
+                else:
+                    candidate = deepcopy(self.digital_twin.state)
+                    for name, value in state.items():
+                        if not hasattr(self.digital_twin.state, name.lower()):
+                            raise ValueError(f"Unknown physical Stage 1 field: {name}")
+                        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                            raise ValueError(f"Invalid physical Stage 1 reading: {name}")
+                        setattr(candidate, name.lower(), value)
+                    old = self.digital_twin.state
+                    self.digital_twin.state = candidate
+                    try:
+                        self.state_manager.transition(self.digital_twin.snapshot())
+                    except Exception:
+                        self.digital_twin.state = old
+                        raise
         return state
 
     def _stage1_sync_loop(self) -> None:
@@ -572,11 +648,11 @@ class IntegrationOrchestrator:
         """Create the single telemetry contract shared by AD and SEM."""
         network: Dict = {}
         if packets:
-            first = packets[0]
+            current = packets[-1]
             network = {
-                'src_ip': first.src_ip, 'dst_ip': first.dst_ip,
-                'src_port': first.src_port, 'dst_port': first.dst_port,
-                'protocol': first.protocol, 'packet_size': first.size,
+                'src_ip': current.src_ip, 'dst_ip': current.dst_ip,
+                'src_port': current.src_port, 'dst_port': current.dst_port,
+                'protocol': current.protocol, 'packet_size': current.size,
             }
         process = self.state_manager.snapshot()
         if not process and self.digital_twin:
@@ -594,6 +670,7 @@ class IntegrationOrchestrator:
         previous = dict(self._previous_process_state)
         event = TelemetryEvent.create(
             event_id=f"event-{len(self.telemetry_events) + 1}",
+            model_features=dict(feature_vector),
             network=network,
             process=process,
             previous_process=previous,
@@ -609,14 +686,54 @@ class IntegrationOrchestrator:
 
         return event
 
+    @staticmethod
+    def _attribute_process_novelty(signature):
+        """Do not turn an unrelated request in an anomalous state into a drop rule."""
+        if signature.get('attack_type') != 'PROCESS_NOVELTY':
+            return
+        actuators = {20: 'p101', 21: 'p201', 22: 'p301', 23: 'p203',
+                     30: 'mv101', 31: 'mv201'}
+        deviations = signature.get('feature_deviations', {})
+        commands = signature.get('modbus_commands') or []
+        signature['modbus_commands'] = [command for command in commands
+            if command.get('function_code', command.get('function')) == 6
+            and actuators.get(command.get('register')) in deviations
+            and command.get('value') == deviations[actuators[command['register']]]['value']]
+        signature['rule_attribution'] = ('matching anomalous actuator write'
+            if signature['modbus_commands'] else 'no attributable actuator write; no rule')
+
+    def _suppress_rule_for_persistent_state_anomaly(self, signature, detection):
+        """A later packet cannot explain an anomaly already seen in the process.
+
+        This is a conservative rule-export guard, not a decision override: the
+        gateway still withholds requests while its state-only detector alarms.
+        """
+        if (not detection.is_anomaly
+                or self.anomaly_detector.feature_source not in ('swat-stage1', 'swat-process')
+                or getattr(detection, 'detection_basis', 'ensemble') != 'ensemble'
+                or not self.detection_history
+                or not self.detection_history[-1].is_anomaly):
+            return
+        signature['modbus_commands'] = []
+        signature['rule_attribution'] = 'process anomaly persisted before current request; no new command rule'
+
     def _finalize_telemetry(self, event: TelemetryEvent, signature: Dict) -> None:
         """Add decoded Modbus context after SEM has examined the packet window."""
-        command = signature.get('modbus_commands', [{}])[0]
+        commands = signature.get('modbus_commands') or []
+        command = commands[0] if commands else {}
         if command:
             event.network.update({
                 'function_code': command.get('function_code', command.get('function')),
                 'register': command.get('register'),
                 'value': command.get('value'),
+            })
+        elif event.model_features.get('modbus_function'):
+            # Rule attribution may deliberately discard a packet candidate.
+            # Preserve the observed command in telemetry for audit and replay.
+            event.network.update({
+                'function_code': event.model_features['modbus_function'],
+                'register': event.model_features['modbus_register'],
+                'value': event.model_features['modbus_value'],
             })
 
     def _extract_candidate_signature(
@@ -687,7 +804,8 @@ class IntegrationOrchestrator:
             'dst_ips': [],
             'ports': [],
             'ip_pairs': [],
-            'modbus_commands': []
+            'modbus_commands': [],
+            'window_command_counts': [],
         }
         
         normal_ranges = {
@@ -702,6 +820,8 @@ class IntegrationOrchestrator:
 
         # Identify affected sensors (SEM approach: compare to normal baseline)
         for sensor in sensor_list:
+            if sensor not in features:
+                continue
             value = features.get(sensor, 0)
             low, high = normal_ranges.get(sensor, (float('-inf'), float('inf')))
             if value < low or value > high:
@@ -739,28 +859,44 @@ class IntegrationOrchestrator:
 
             # Decode Modbus/TCP FC06 requests from captured TCP payloads.
             # MBAP header is 7 bytes; function, register and value follow.
-            for packet in packets:
-                if packet.protocol != 'tcp' or packet.dst_port != 5020 or not packet.raw_data:
+            command_counts = {}
+            for index, packet in enumerate(packets):
+                if (packet.protocol != 'tcp' or
+                        (packet.dst_port != 5020 and
+                         getattr(packet, 'modbus_payload', None) is None)):
                     continue
                 try:
-                    from scapy.all import IP, Raw
-                    dissected = IP(packet.raw_data)
-                    if not dissected.haslayer(Raw):
-                        continue
-                    payload = bytes(dissected[Raw].load)
+                    payload = getattr(packet, 'modbus_payload', None)
+                    if payload is None:
+                        if not packet.raw_data:
+                            continue
+                        from scapy.all import IP, Raw
+                        dissected = IP(packet.raw_data)
+                        if not dissected.haslayer(Raw):
+                            continue
+                        payload = bytes(dissected[Raw].load)
                     if len(payload) >= 12 and payload[2:4] == b'\x00\x00' and payload[7] == 6:
-                        signature['modbus_commands'].append({
+                        command = {
                             'function': 6,
                             'function_code': 6,
                             'register': int.from_bytes(payload[8:10], 'big'),
                             'value': int.from_bytes(payload[10:12], 'big'),
                             'src_ip': packet.src_ip,
                             'dst_ip': packet.dst_ip,
-                        })
+                        }
+                        key = (command['function_code'], command['register'], command['value'])
+                        command_counts[key] = command_counts.get(key, 0) + 1
+                        if index == len(packets) - 1:
+                            signature['modbus_commands'].append(command)
                 except Exception:
                     continue
+            signature['window_command_counts'] = [
+                {'function_code': function, 'register': register, 'value': value,
+                 'count': count}
+                for (function, register, value), count in sorted(command_counts.items())
+            ]
         
-        logger.info(f"📋 Extracted signature (SEM format): {json.dumps(signature, indent=2)}")
+        logger.info(f"📋 Candidate signature before detection (SEM format): {json.dumps(signature, indent=2)}")
         return signature
     
     def get_pipeline_status(self) -> Dict:

@@ -18,6 +18,8 @@ class TelemetryEvent:
     previous_process: Dict[str, Any] = field(default_factory=dict)
     state_change: Dict[str, Any] = field(default_factory=dict)
     network_statistics: Dict[str, Any] = field(default_factory=dict)
+    model_features: Dict[str, Any] = field(default_factory=dict)
+    detection: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def create(cls, event_id: str, **kwargs: Any) -> "TelemetryEvent":

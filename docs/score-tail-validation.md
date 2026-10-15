@@ -1,0 +1,7 @@
+# Score saturation fix and calibration (2026-10-13)
+
+Implemented scoring version normal_ecdf_tail_v2. Training-only component rank references are extended smoothly beyond their maxima: rank + [excess/(training_std+excess)]/(N+1). Scores remain below 1 but can exceed the old N/(N+1) plateau. Old v1 artifacts preserve their prior behavior; new artifacts require valid positive tail scales. Training and live scoring share the same implementation. Threshold remains the conservative normal-calibration order statistic; no held-out labels select it.
+
+Artifact: validation/native-tail/detector_candidate.pkl. Threshold: 0.9982352712483613. Existing data regression: TP30/FN0/FP12/TN18; ensemble-only results identical. Earlier apparent zero false positives came with saturated ensemble sensitivity. Replaying the six latest normal VM observations gives 6 ALLOW. Neither replay is fresh independent evaluation. Sixty calibration normals cannot substantiate a 1% tail target (resolution 1/61). Do not enable automatic pfSense deployment with this candidate.
+
+Tests: 86 run, 78 passed, 8 skipped. Added continuous-tail test requires strictly increasing scores and an ensemble-only anomaly without actuator support. Existing tests verify training-only fitting, held-out label independence, runtime/batch agreement, artifact compatibility and gateway/SEM contracts. Fresh representative sessions remain necessary to address process drift and normal coverage.

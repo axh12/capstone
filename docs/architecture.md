@@ -1,5 +1,13 @@
 # System Architecture
 
+> **Research setup and current implementation:** There is no physical SCADA
+> system in the VM experiment. The gateway uses an integrated simulated Twin
+> and a loopback mock SCADA endpoint. The historical SWaT CSV contains
+> timestamped state and aggregate network data, but no replayable Modbus
+> payloads. Its saved model cannot run against the Twin's different feature
+> schema. See [Research dataset workflow](research-dataset-workflow.md) for
+> the intended experiment, implemented paths and remaining data requirements.
+
 ## 1. Overview
 
 The project is an inline SCADA deception and intrusion-prevention system.

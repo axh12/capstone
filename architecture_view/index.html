@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d29">
+  <meta name="description" content="Interactive architecture and test traversal for the Capstone inline Digital Twin lab.">
+  <title>Capstone | Architecture & test traversal</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#architecture">Skip to architecture</a>
+
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Capstone architecture, top of page">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span><strong>CAPSTONE</strong><small>RESEARCH LAB / SYSTEM MAP</small></span>
+      </a>
+      <nav class="top-nav" aria-label="Page sections">
+        <a href="#architecture">Architecture</a>
+        <a href="#traversal">Test traversal</a>
+        <a href="#evidence">Evidence</a>
+      </nav>
+      <span class="header-status"><span class="pulse-dot" aria-hidden="true"></span>LAB MODEL</span>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> INLINE DIGITAL TWIN / MODBUS TCP</p>
+          <h1 id="hero-title">From a packet to<br><em>a decision.</em></h1>
+          <p class="hero-intro">Explore how a Kali request crosses pfSense, enters the Ubuntu gateway, changes a simulated Twin, and reaches either the mock SCADA or a block decision.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#traversal">Walk through a test <span aria-hidden="true">↗</span></a>
+            <a class="button button-ghost" href="#architecture">Explore the flow <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+        <div class="hero-aside" aria-label="System facts">
+          <div class="aside-topline"><span>EXPERIMENT PROFILE</span><span>01 / 04</span></div>
+          <div class="signal-graphic" aria-hidden="true">
+            <div class="signal-orbit orbit-one"></div><div class="signal-orbit orbit-two"></div>
+            <div class="signal-core"><span>DT</span></div>
+            <span class="signal-node signal-a"></span><span class="signal-node signal-b"></span><span class="signal-node signal-c"></span>
+          </div>
+          <div class="aside-caption"><span class="caption-kicker">OBSERVE → SIMULATE → DECIDE</span><strong>One request remains inline until classification completes.</strong></div>
+        </div>
+      </section>
+
+      <section class="facts" aria-label="Architecture facts">
+        <div class="fact"><span class="fact-number">60<span>s</span></span><span class="fact-label">rolling window<br>per source IP</span></div>
+        <div class="fact"><span class="fact-number">02</span><span class="fact-label">parallel paths<br>AD + SEM</span></div>
+        <div class="fact"><span class="fact-number">96</span><span class="fact-label">local tests<br>8 skipped</span></div>
+        <div class="fact"><span class="fact-number">00</span><span class="fact-label">physical PLCs<br>in this lab</span></div>
+      </section>
+
+      <section class="section architecture-section" id="architecture" aria-labelledby="architecture-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">01 / SYSTEM FLOW</p><h2 id="architecture-title">The architecture</h2></div>
+          <p>Click any component to see what it does. The test traversal below lights up the same path as a request moves through it.</p>
+        </div>
+
+        <div class="architecture-layout">
+          <div class="flow-panel" aria-label="Interactive architecture diagram">
+            <div class="flow-panel-head"><span><span class="live-dot"></span> INLINE PATH</span><span>LAB NETWORK / TCP 5020</span></div>
+            <div class="flow-lane flow-lane-entry" aria-label="Network entry">
+              <button class="flow-node" type="button" data-node="kali"><span class="node-index">01 / SOURCE</span><span class="node-symbol">⌁</span><strong>Kali client</strong><small>Modbus FC03 / FC06</small></button>
+              <span class="flow-arrow" aria-hidden="true">→</span>
+              <button class="flow-node" type="button" data-node="pfsense"><span class="node-index">02 / PERIMETER</span><span class="node-symbol">◇</span><strong>pfSense + Snort</strong><small>WAN em0 → LAN</small></button>
+              <span class="flow-arrow" aria-hidden="true">→</span>
+              <button class="flow-node" type="button" data-node="gateway"><span class="node-index">03 / INLINE</span><span class="node-symbol">▣</span><strong>Ubuntu gateway</strong><small>192.168.58.105:5020</small></button>
+            </div>
+
+            <div class="lane-connector" aria-hidden="true"><span>request held before upstream forwarding</span><i>↓</i></div>
+
+            <div class="flow-lane flow-lane-analysis" aria-label="Simulation and analysis">
+              <button class="flow-node flow-node-wide" type="button" data-node="window"><span class="node-index">04 / AGGREGATE</span><span class="node-symbol">◷</span><strong>60-second source window</strong><small>Trailing batch, scored on each arrival</small></button>
+              <span class="flow-arrow" aria-hidden="true">→</span>
+              <button class="flow-node flow-node-wide" type="button" data-node="twin"><span class="node-index">05 / SIMULATE</span><span class="node-symbol">◈</span><strong>Digital Twin</strong><small>Physics + state + telemetry</small></button>
+            </div>
+
+            <div class="lane-connector" aria-hidden="true"><span>same observation, two workers</span><i>↓</i></div>
+
+            <div class="parallel-band" aria-label="Parallel analysis">
+              <span class="parallel-label">PARALLEL</span>
+              <button class="flow-node analysis-node" type="button" data-node="ad"><span class="node-index">06A / SCORE</span><span class="node-symbol">∿</span><strong>Anomaly detection</strong><small>Calibrated ensemble verdict</small></button>
+              <span class="parallel-plus" aria-hidden="true">+</span>
+              <button class="flow-node analysis-node" type="button" data-node="sem"><span class="node-index">06B / EXTRACT</span><span class="node-symbol">⊞</span><strong>SEM</strong><small>Window context + current command</small></button>
+            </div>
+
+            <div class="lane-connector" aria-hidden="true"><span>join both results</span><i>↓</i></div>
+
+            <div class="flow-lane flow-lane-decision">
+              <button class="flow-node decision-node" type="button" data-node="decision"><span class="node-index">07 / GATE</span><span class="node-symbol">⟡</span><strong>Decision engine</strong><small>ALLOW or BLOCK</small></button>
+            </div>
+
+            <div class="outcome-grid" aria-label="Decision outcomes">
+              <div class="outcome-card outcome-allow"><span class="outcome-route">ALLOW ↘</span><button class="flow-node" type="button" data-node="scada"><span class="node-index">08A / FORWARD</span><span class="node-symbol">◉</span><strong>Mock SCADA</strong><small>127.0.0.1:15020</small></button><p>Forward once. Return the upstream response.</p></div>
+              <div class="outcome-card outcome-block"><span class="outcome-route">BLOCK ↙</span><button class="flow-node" type="button" data-node="block"><span class="node-index">08B / WITHHOLD</span><span class="node-symbol">⊘</span><strong>Block + respond</strong><small>Modbus exception 04</small></button><p>Withhold the write; mock safety action may switch pumps OFF.</p></div>
+            </div>
+            <div class="rule-strip"><span class="rule-icon">↗</span><div><strong>SEM rule path</strong><span>Command-specific Snort drop rule → local file → pfSense only if deployment is configured.</span></div><span class="rule-badge">CONDITIONAL</span></div>
+          </div>
+
+          <aside class="inspector" aria-live="polite" aria-labelledby="inspector-heading">
+            <div class="inspector-top"><span>COMPONENT INSPECTOR</span><span id="inspector-index">03 / INLINE</span></div>
+            <span class="inspector-symbol" id="inspector-symbol" aria-hidden="true">▣</span>
+            <h3 id="inspector-heading">Ubuntu gateway</h3>
+            <p id="inspector-description">The gateway holds each supported request while simulation, anomaly scoring and SEM complete. It forwards only an ALLOW decision to mock SCADA.</p>
+            <div class="inspector-divider"></div>
+            <dl><div><dt>INPUT</dt><dd id="inspector-input">Modbus request from pfSense</dd></div><div><dt>OUTPUT</dt><dd id="inspector-output">Forward once or return a block response</dd></div><div><dt>CODE</dt><dd id="inspector-code">modbus_gateway.py</dd></div></dl>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section traversal-section" id="traversal" aria-labelledby="traversal-title">
+        <div class="section-heading"><div><p class="eyebrow">02 / OBSERVED PATHS</p><h2 id="traversal-title">Test traversal</h2></div><p>Select a case, then step through what was sent, observed, and verified. Diagram components highlight as the request moves.</p></div>
+        <div class="traversal-layout">
+          <div class="case-list" role="tablist" aria-label="Test cases">
+            <button class="case-tab" type="button" role="tab" id="case-tab-normal" aria-controls="case-panel" data-case="normal" aria-selected="true"><span class="case-top"><span class="case-count">01</span><span class="case-status status-pass">PASS</span></span><strong>Benign write</strong><small>Register 30 = 1</small></button>
+            <button class="case-tab" type="button" role="tab" id="case-tab-buildup" aria-controls="case-panel" data-case="buildup" aria-selected="false"><span class="case-top"><span class="case-count">02</span><span class="case-status status-observed">OBSERVED</span></span><strong>Detection buildup</strong><small>Register 23 × 40</small></button>
+            <button class="case-tab" type="button" role="tab" id="case-tab-block" aria-controls="case-panel" data-case="block" aria-selected="false"><span class="case-top"><span class="case-count">03</span><span class="case-status status-pass">PASS</span></span><strong>Block + recovery</strong><small>Writes 33–40 rejected</small></button>
+            <button class="case-tab" type="button" role="tab" id="case-tab-window" aria-controls="case-panel" data-case="window" aria-selected="false"><span class="case-top"><span class="case-count">04</span><span class="case-status status-local">LOCAL</span></span><strong>Rolling batch</strong><small>Counts 1 → 2 → 3</small></button>
+          </div>
+
+          <div class="traversal-card" id="case-panel" role="tabpanel" aria-labelledby="case-tab-normal" tabindex="0">
+            <div class="traversal-card-head"><div><span id="case-scope" class="scope-chip">RECORDED VM RUN</span><span class="card-step" id="step-indicator">STEP 01 / 04</span></div><span class="card-path">KALI → UBUNTU</span></div>
+            <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+            <div class="traversal-content"><p class="step-label" id="step-label">COMMAND SENT</p><h3 id="step-title">Normal Modbus write</h3><p id="step-description">Kali sends a write to register 30 with value 1 through pfSense to the Ubuntu gateway.</p><div class="active-path" id="active-path" aria-label="Components in this step"></div><div class="command-box"><span>OBSERVATION / COMMAND</span><code id="step-command">python3 ~/lab_modbus_client.py --host 192.168.58.105 --case normal</code></div><div class="step-detail"><span class="detail-icon" id="step-detail-icon" aria-hidden="true">↗</span><p id="step-detail-text">The request is still held by the inline gateway at this point.</p></div></div>
+            <div class="traversal-card-foot"><div class="step-dots" id="step-dots" aria-label="Steps"></div><div class="step-controls"><button type="button" id="prev-step" aria-label="Previous step">←</button><button type="button" id="next-step" aria-label="Next step">→</button></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section evidence-section" id="evidence" aria-labelledby="evidence-title">
+        <div class="section-heading"><div><p class="eyebrow">03 / VALIDATION</p><h2 id="evidence-title">What the tests establish</h2></div><p>The evidence is split by where it was observed. Local tests and historical VM runs do not prove the same thing.</p></div>
+        <div class="evidence-grid">
+          <article class="evidence-card"><span class="evidence-number">01</span><span class="evidence-tag">AUTOMATED / LOCAL</span><h3>Gateway and components</h3><p>96 unit and loopback tests ran: 88 passed and 8 were skipped. They include source isolation, window expiry, current-command attribution, forwarding, and blocking.</p><span class="evidence-foot">Latest local suite <strong>PASS</strong></span></article>
+          <article class="evidence-card"><span class="evidence-number">02</span><span class="evidence-tag">RECORDED / VM</span><h3>Kali → mock SCADA</h3><p>In the prior VM run, writes 1–32 to register 23 were allowed; writes 33–40 were rejected. A later normal write passed, and mock register 23 read back as 0.</p><span class="evidence-foot">Before rolling-window update <strong>OBSERVED</strong></span></article>
+          <article class="evidence-card"><span class="evidence-number">03</span><span class="evidence-tag">OPEN / RESEARCH</span><h3>Detection and IPS</h3><p>The SWaT-process model scores process state, not one-minute traffic rate. The new window needs a VM repeat; automatic pfSense deployment was off in the recorded run.</p><span class="evidence-foot">Model + IPS validation <strong>PENDING</strong></span></article>
+        </div>
+        <div class="research-note"><span aria-hidden="true">ⓘ</span><p><strong>Research boundary.</strong> This is an isolated mock-SCADA experiment. Historical SWaT data supplies state observations but no replayable Modbus payloads; the Digital Twin is a simplified simulation, not a physical PLC.</p></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>CAPSTONE / ARCHITECTURE VIEW</span><span>Local, dependency-free HTML · CSS · JS</span><a href="#top">Back to top ↑</a></footer>
+  </div>
+</body>
+</html>

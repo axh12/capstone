@@ -1,5 +1,11 @@
 # SWaT Anomaly Detection System
 
+> **Historical experiment:** The metrics below describe the original SWaT
+> analysis, not the current gateway model or a validated zero-day detector.
+> The historical CSV has aligned sensor and aggregate network measurements
+> but no replayable Modbus packet payloads. See
+> [Research dataset workflow](../docs/research-dataset-workflow.md).
+
 **Temporal Ensembled Anomaly Detection with Modular Pipeline Architecture**
 
 A production-ready anomaly detection system for detecting cyber-physical attacks in water treatment plants using an ensemble of unsupervised machine learning detectors.

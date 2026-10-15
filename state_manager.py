@@ -24,6 +24,7 @@ class StateValidator:
 
     LIMITS = {
         "LIT101": (0.0, 1200.0), "LIT201": (0.0, 1000.0), "LIT301": (0.0, 1000.0),
+        "distance_cm": (0.0, 1000.0),
         "AIT201_ORP": (0.0, 1000.0), "AIT202_pH": (0.0, 14.0),
     }
     ACTUATORS = {"p101", "mv101", "p201", "p203", "mv201", "p301"}
@@ -38,8 +39,13 @@ class StateValidator:
                 if not low <= value <= high:
                     return False, f"{name}={value} outside [{low}, {high}]"
         for name in self.ACTUATORS:
-            if name in state and int(state[name]) not in (0, 1):
-                return False, f"{name} must be 0 or 1"
+            if name in state:
+                try:
+                    value = float(state[name])
+                except (TypeError, ValueError, OverflowError):
+                    return False, f"{name} must be 0 or 1"
+                if value not in (0.0, 1.0):
+                    return False, f"{name} must be 0 or 1"
         return True, "ok"
 
 
@@ -82,6 +88,7 @@ class StateManager:
             )
 
     def apply_patch(self, patch: Mapping[str, Any]) -> StateTransition:
-        candidate = self.snapshot()
-        candidate.update(patch)
-        return self.transition(candidate)
+        with self._lock:
+            candidate = self.snapshot()
+            candidate.update(patch)
+            return self.transition(candidate)

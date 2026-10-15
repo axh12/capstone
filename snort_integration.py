@@ -34,6 +34,7 @@ class SnortRuleManager:
         self.blocking = blocking
         self.expiration_seconds = expiration_seconds
         self.apply_command = apply_command
+        self.deployer = None
         # IP-only blocking is disabled by default to avoid false positives.
         self.allow_ip_fallback = allow_ip_fallback
         self._rules: Dict[str, str] = {}
@@ -159,6 +160,8 @@ class SnortRuleManager:
 
     def apply(self) -> Optional[str]:
         """Run the explicitly configured reload command, if any."""
+        if self.deployer:
+            return self.deployer(self.rules_path)
         if not self.apply_command:
             return None
         command = self.apply_command.replace("{rules_file}", shlex.quote(str(self.rules_path)))
@@ -172,4 +175,4 @@ class SnortRuleManager:
             return {"rules": [], "path": None, "applied": False, "reason": "no concrete network tuple"}
         path = self.write()
         output = self.apply()
-        return {"rules": rules, "path": str(path), "applied": bool(self.apply_command), "command_output": output}
+        return {"rules": rules, "path": str(path), "applied": bool(self.apply_command or self.deployer), "command_output": output}

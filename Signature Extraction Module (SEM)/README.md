@@ -1,5 +1,12 @@
 # Signature Extraction Module (SEM) - Final Capstone Project
 
+> **Research scope:** The metrics below come from the historical analysis.
+> Live packet-specific rules require observed Modbus payloads; they cannot
+> be reconstructed from the historical CSV's aggregate network columns.
+> The current gateway's SEM decodes observed commands and deploys a rule
+> only after an anomalous decision. See
+> [Research dataset workflow](../docs/research-dataset-workflow.md).
+
 ## Project Overview
 
 This capstone project implements a comprehensive anomaly detection system for the Secure Water Treatment (SWaT) testbed, focusing on detecting cyber-physical attacks in industrial control systems.

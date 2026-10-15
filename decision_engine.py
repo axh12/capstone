@@ -23,7 +23,17 @@ class DecisionEngine:
     """Only anomalous behavior can activate a candidate rule."""
 
     def decide(self, anomaly_result: Any, signature: Optional[Dict[str, Any]],
-               candidate_rule: Optional[str] = None) -> DecisionResult:
+               candidate_rule: Optional[str] = None,
+               actionable: Optional[bool] = None) -> DecisionResult:
+        if actionable is False:
+            reason = ("process alarm without an attributable command; continue monitoring"
+                      if bool(getattr(anomaly_result, "is_anomaly", False)) else
+                      "normal observation; no attributable command")
+            return DecisionResult(Decision.ALLOW, reason)
+        if actionable is True:
+            return DecisionResult(Decision.BLOCK,
+                "command caused a model threshold crossing or is already quarantined",
+                signature, candidate_rule)
         if bool(getattr(anomaly_result, "is_anomaly", False)):
             return DecisionResult(Decision.BLOCK, "anomaly detected", signature, candidate_rule)
         return DecisionResult(Decision.ALLOW, "normal traffic; candidate discarded", None, None)

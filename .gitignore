@@ -5,9 +5,17 @@ __pycache__/
 .venv/
 venv/
 env/
+dt-venv/
 
 *.log
 demo_session_*.json
 demo_session_*_rules.json
 
 .DS_Store
+
+# Local lab credentials and generated experiment outputs.
+/pfsense-deployment.json
+/pfsense-deployment.before-key-reset.json
+/validation/
+/artifacts/
+/docs/test-results.txt

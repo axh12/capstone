@@ -1,5 +1,12 @@
 # Integration Summary
 
+> **Current research status:** This document describes the original proposed
+> integration and contains historical performance claims. The VM experiment
+> has no physical SCADA/PLC. See [Research dataset workflow](docs/research-dataset-workflow.md)
+> for the implemented Twin → ensemble/SEM → pfSense path, the mock SCADA
+> endpoint, the historical dataset's missing Modbus payloads, and measured
+> detector limitations. Do not treat the metrics below as live gateway results.
+
 ## What Was Built
 
 A **complete integrated threat detection and response system** that connects your three capstone components:
