@@ -1,0 +1,24 @@
+{
+  "id": "L1-031",
+  "name": "Subtle false flow",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "spoof",
+  "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+  "parameters": {
+    "overrides": {
+      "FIT101": 0.05
+    },
+    "register": 110,
+    "steps": 1
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "detected": false,
+    "prevention_passed": false
+  },
+  "error": null,
+  "elapsed_seconds": 0.05938400099876162,
+  "serial_requests_recorded": 1
+}

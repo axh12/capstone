@@ -1,0 +1,26 @@
+{
+  "id": "L1-142",
+  "name": "Combined sensor spoof {'LIT101': 740.0, 'FIT101': -0.101}",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "spoof",
+  "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+  "parameters": {
+    "level": 740.0,
+    "register": 100,
+    "steps": 2,
+    "overrides": {
+      "LIT101": 740.0,
+      "FIT101": -0.101
+    }
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "prevention_passed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.11788344399974449,
+  "serial_requests_recorded": 2
+}

@@ -1,0 +1,21 @@
+{
+  "id": "L1-121",
+  "name": "Modbus valve_value2",
+  "area": "protocol",
+  "category": "malicious",
+  "kind": "protocol",
+  "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+  "parameters": {
+    "mode": "valve_value2"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "protocol_rejected": true,
+    "valid_followup_allowed": true,
+    "rejection_layer": "protocol validation; not ML"
+  },
+  "error": null,
+  "elapsed_seconds": 0.10477800700027728,
+  "serial_requests_recorded": 2
+}

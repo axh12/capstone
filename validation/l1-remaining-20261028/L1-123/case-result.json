@@ -1,0 +1,21 @@
+{
+  "id": "L1-123",
+  "name": "Modbus legacy_flow_write",
+  "area": "protocol",
+  "category": "malicious",
+  "kind": "protocol",
+  "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+  "parameters": {
+    "mode": "legacy_flow_write"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "protocol_rejected": true,
+    "valid_followup_allowed": true,
+    "rejection_layer": "protocol validation; not ML"
+  },
+  "error": null,
+  "elapsed_seconds": 0.18261227900075028,
+  "serial_requests_recorded": 2
+}

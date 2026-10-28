@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "domain": "swat-stage1-only-mock",
+  "training_rows": 4917,
+  "train_end": "2019-12-06T12:17:01+00:00",
+  "normal_reference": {
+    "LIT101": 739.4042,
+    "FIT101": 0.0
+  },
+  "normal_level_quantiles": {
+    "low": 496.85355024,
+    "high": 831.7659
+  },
+  "calibration_counts": {
+    "steady_filling": 558,
+    "steady_draining": 2008
+  },
+  "physics": {
+    "stage1_topology": "swat_stage1",
+    "stage1_inlet_flow_m3h": 4.370496,
+    "stage1_pump_flow_m3h": 2.091518124686463,
+    "flow_noise_m3h": 0.011529925000000052,
+    "tank_area_m2": {
+      "lit101": 1.345602318087259
+    }
+  },
+  "limitations": [
+    "Only LIT101, FIT101, MV101, P101 and P102 participate.",
+    "Parameters use chronological training normals only, never calibration or test observations.",
+    "Effective area and pump capacity are nominal mass-balance estimates, not physical measurements.",
+    "P102 is assumed to have the same capacity as P101; standby duty needs independent validation.",
+    "SWaT status 2 maps to binary 1, status 1 to binary 0; transitional status 0 is excluded from fitting.",
+    "One accepted write advances one simulated second; reads do not advance time.",
+    "No packet replay or full SWaT equivalence is claimed."
+  ],
+  "dataset_sha256": "c8f7c1b53ccdb9df894a2b79ded7071b9eabf9425e018b426d41e659b1728102"
+}

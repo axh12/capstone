@@ -1,0 +1,21 @@
+{
+  "id": "L1-132",
+  "name": "Modbus long_pdu",
+  "area": "protocol",
+  "category": "malicious",
+  "kind": "protocol",
+  "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+  "parameters": {
+    "mode": "long_pdu"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "protocol_rejected": true,
+    "valid_followup_allowed": true,
+    "rejection_layer": "protocol validation; not ML"
+  },
+  "error": null,
+  "elapsed_seconds": 0.19839259100081108,
+  "serial_requests_recorded": 2
+}

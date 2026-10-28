@@ -1,0 +1,19 @@
+{
+  "id": "L1-006",
+  "name": "Normal P101 transfer at 820 mm",
+  "area": "normal",
+  "category": "benign",
+  "kind": "normal",
+  "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+  "parameters": {
+    "level": 820.0,
+    "register": 20,
+    "steps": 12
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.8820860819996597,
+  "serial_requests_recorded": 12
+}

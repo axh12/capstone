@@ -1,0 +1,23 @@
+{
+  "id": "L1-082",
+  "name": "Sustained draining detection and recovery",
+  "area": "process",
+  "category": "malicious",
+  "kind": "draining",
+  "criterion": "Detect sustained draining within 300 commands, generate a rule, block exact replay, and allow the identical benign packet afterward. Early allowed attacks are disclosed.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "first_block_step": 225,
+    "early_allowed": 224,
+    "detected": true,
+    "first_packet_prevention": false,
+    "rule_generated": true,
+    "replay_blocked": true,
+    "benign_after_allowed": true
+  },
+  "error": null,
+  "elapsed_seconds": 21.24728213599883,
+  "serial_requests_recorded": 228
+}

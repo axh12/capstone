@@ -1,0 +1,18 @@
+{
+  "id": "L1-011",
+  "name": "Changeover register 24 to 20",
+  "area": "normal",
+  "category": "benign",
+  "kind": "changeover",
+  "criterion": "Both requested duty/standby transitions are acknowledged and applied.",
+  "parameters": {
+    "first": 24,
+    "second": 20
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.755122967000716,
+  "serial_requests_recorded": 4
+}

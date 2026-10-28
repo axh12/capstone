@@ -1,0 +1,18 @@
+{
+  "id": "L1-079",
+  "name": "Rule expiration and quarantine consistency",
+  "area": "rules",
+  "category": "robustness",
+  "kind": "expiry",
+  "criterion": "After explicit rule expiration, a now-safe command is no longer blocked solely by the old quarantine.",
+  "parameters": {},
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "rule_file_expired": true,
+    "safe_command_allowed": false
+  },
+  "error": null,
+  "elapsed_seconds": 0.447561623999718,
+  "serial_requests_recorded": 2
+}

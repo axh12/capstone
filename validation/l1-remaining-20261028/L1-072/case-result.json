@@ -1,0 +1,17 @@
+{
+  "id": "L1-072",
+  "name": "Rule selectivity exact",
+  "area": "rules",
+  "category": "malicious",
+  "kind": "rule",
+  "criterion": "Generated command signature blocks the designated replay while the declared unrelated safe command passes.",
+  "parameters": {
+    "mode": "exact"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.33650734599905263,
+  "serial_requests_recorded": 2
+}

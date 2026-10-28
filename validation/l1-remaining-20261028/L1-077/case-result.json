@@ -1,0 +1,15 @@
+{
+  "id": "L1-077",
+  "name": "Normal request after gateway restart",
+  "area": "recovery",
+  "category": "robustness",
+  "kind": "restart",
+  "criterion": "A valid request succeeds after actual gateway component restart.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.13077068800157576,
+  "serial_requests_recorded": 1
+}

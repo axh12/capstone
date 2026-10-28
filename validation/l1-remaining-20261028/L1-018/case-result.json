@@ -1,0 +1,28 @@
+{
+  "id": "L1-018",
+  "name": "Inlet opening at capacity boundary 1200 mm",
+  "area": "boundary",
+  "category": "malicious",
+  "kind": "hazard",
+  "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+  "parameters": {
+    "level": 1200.0,
+    "register": 30,
+    "pumps": 0,
+    "limit": "high"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "first_block_step": 1,
+    "detected": true,
+    "prevention_passed": true,
+    "minimum_level_mm": 1200.0,
+    "spill_m3": 0.0,
+    "low_level_limit_mm": null,
+    "replay_blocked": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.29349990300033824,
+  "serial_requests_recorded": 2
+}

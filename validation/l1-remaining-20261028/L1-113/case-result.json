@@ -1,0 +1,20 @@
+{
+  "id": "L1-113",
+  "name": "Recovery after telemetry nan",
+  "area": "recovery",
+  "category": "robustness",
+  "kind": "fault_recovery",
+  "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+  "parameters": {
+    "fault": "nan"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "fault_fail_closed": true,
+    "recovered": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.10379581300003338,
+  "serial_requests_recorded": 2
+}

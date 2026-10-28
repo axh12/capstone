@@ -1,0 +1,15 @@
+{
+  "id": "L1-137",
+  "name": "Quarantined payload with changed transaction ID",
+  "area": "rules",
+  "category": "malicious",
+  "kind": "changed_tx",
+  "criterion": "A quarantined command remains blocked with a different transaction ID; a benign command still passes.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.5070000070008973,
+  "serial_requests_recorded": 3
+}

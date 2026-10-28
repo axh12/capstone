@@ -1,0 +1,21 @@
+{
+  "id": "L1-125",
+  "name": "Modbus other_stage_write",
+  "area": "protocol",
+  "category": "malicious",
+  "kind": "protocol",
+  "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+  "parameters": {
+    "mode": "other_stage_write"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "protocol_rejected": true,
+    "valid_followup_allowed": true,
+    "rejection_layer": "protocol validation; not ML"
+  },
+  "error": null,
+  "elapsed_seconds": 0.10292612200100848,
+  "serial_requests_recorded": 2
+}

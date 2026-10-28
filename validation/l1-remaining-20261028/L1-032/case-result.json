@@ -1,0 +1,24 @@
+{
+  "id": "L1-032",
+  "name": "Persistent false level",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "spoof",
+  "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+  "parameters": {
+    "overrides": {
+      "LIT101": 100.0
+    },
+    "register": 100,
+    "steps": 3
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "prevention_passed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.22236949000034656,
+  "serial_requests_recorded": 3
+}

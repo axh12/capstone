@@ -1,0 +1,15 @@
+{
+  "id": "L1-012",
+  "name": "Safe rapid pump reversals",
+  "area": "normal",
+  "category": "benign",
+  "kind": "reversal",
+  "criterion": "All safe ON/OFF reversals are acknowledged; no stale decisions or spill.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 2.0052607580000767,
+  "serial_requests_recorded": 10
+}

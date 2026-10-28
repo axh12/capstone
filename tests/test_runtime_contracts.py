@@ -10,7 +10,8 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 
-from physical_stage1 import ArduinoNanoSerialStage1Connector, ModbusReadOnlyStage1Connector
+from physical_stage1 import (ArduinoNanoSerialStage1Connector,
+                             ArduinoNanoModbusForwarder, ModbusReadOnlyStage1Connector)
 from feature_extractor import FeatureExtractor
 from network_integration import PacketEvent
 from orchestrator import IntegrationOrchestrator
@@ -178,6 +179,37 @@ class Stage1ConnectorTests(unittest.TestCase):
         serial_port.close.assert_called_once_with()
         serial_port.write.assert_not_called()
 
+    def test_nano_pump_command_waits_for_matching_ack_amid_telemetry(self):
+        connector = ArduinoNanoSerialStage1Connector('/dev/example', baudrate=9600,
+                                                       serial_format='arduino-text')
+        serial_port = Mock()
+        serial_port.readline.side_effect = [b'Distance: 4 cm\r\n', b'Flow: 0.00 L/min\r\n',
+                                            b'ACK P1 1 1\r\n']
+        connector._serial = serial_port
+        connector.command_pump1(1)
+        serial_port.write.assert_called_once_with(b'P1 1 1\n')
+        serial_port.flush.assert_called_once_with()
+
+    def test_nano_rejected_command_never_returns_success(self):
+        connector = ArduinoNanoSerialStage1Connector('/dev/example', baudrate=9600,
+                                                       serial_format='arduino-text')
+        serial_port = Mock()
+        serial_port.readline.return_value = b'ERR P1 1 SENSOR_OR_FULL\r\n'
+        connector._serial = serial_port
+        with self.assertRaisesRegex(RuntimeError, 'SENSOR_OR_FULL'):
+            connector.command_pump1(1)
+
+    def test_physical_forwarder_rejects_manual_pump_and_accepts_pump1(self):
+        connector = Mock()
+        forward = ArduinoNanoModbusForwarder(connector)
+        import struct
+        pump2 = struct.pack('>HHHBBHH', 1, 0, 6, 1, 6, 20, 1)
+        pump1 = struct.pack('>HHHBBHH', 2, 0, 6, 1, 6, 30, 0)
+        self.assertEqual(forward(pump2)[7:], b'\x86\x02')
+        connector.command_pump1.assert_not_called()
+        self.assertEqual(forward(pump1), pump1)
+        connector.command_pump1.assert_called_once_with(0)
+
     def test_nano_serial_accepts_displayed_water_level_directly(self):
         connector = ArduinoNanoSerialStage1Connector('/dev/example')
         self.assertEqual(connector._decode(
@@ -206,11 +238,71 @@ class Stage1ConnectorTests(unittest.TestCase):
         self.assertAlmostEqual(state['FIT201'], 0.45)
         self.assertNotIn('LIT101', state)
 
+    def test_nano_accepts_unlabelled_distance_from_attached_firmware(self):
+        connector = ArduinoNanoSerialStage1Connector(
+            '/dev/example', baudrate=9600, serial_format='arduino-text')
+        serial_port = Mock()
+        serial_port.readline.side_effect = [b'\r\n', b'Flow: 0.00 L/min\r\n',
+                                            b'8 cm\r\n', b'Flow: 7.50 L/min\r\n']
+        serial_port.in_waiting = 0
+        connector._serial = serial_port
+        state = connector.read_state()
+        self.assertEqual(state['distance_cm'], 8.0)
+        self.assertAlmostEqual(state['FIT201'], 0.45)
+
+    def test_nano_accepts_observed_truncated_distance_prefix(self):
+        connector = ArduinoNanoSerialStage1Connector(
+            '/dev/example', baudrate=9600, serial_format='arduino-text')
+        serial_port = Mock()
+        serial_port.readline.side_effect = [b'stance: 4 cm\r\n',
+                                            b'Flow: 2.50 L/min\r\n']
+        serial_port.in_waiting = 0
+        connector._serial = serial_port
+        state = connector.read_state()
+        self.assertEqual(state['distance_cm'], 4.0)
+        self.assertAlmostEqual(state['FIT201'], 0.15)
+
+    def test_nano_resynchronizes_after_partial_usb_line(self):
+        connector = ArduinoNanoSerialStage1Connector(
+            '/dev/example', baudrate=9600, serial_format='arduino-text')
+        serial_port = Mock()
+        serial_port.readline.side_effect = [b'0 L/min\r\n', b'Distance: 6 cm\r\n',
+                                            b'Flow: 1.50 L/min\r\n']
+        serial_port.in_waiting = 0
+        connector._serial = serial_port
+        self.assertEqual(connector.read_state(), {'distance_cm': 6.0, 'FIT201': 0.09})
+
+    def test_nano_partial_usb_line_alone_cannot_become_state(self):
+        connector = ArduinoNanoSerialStage1Connector(
+            '/dev/example', baudrate=9600, serial_format='arduino-text')
+        serial_port = Mock()
+        serial_port.readline.side_effect = [b'0 L/min\r\n', b'']
+        connector._serial = serial_port
+        with self.assertRaisesRegex(ValueError, 'Unexpected Nano text telemetry line'):
+            connector.read_state()
+
+    def test_nano_skips_transient_no_echo_but_rejects_only_no_echo(self):
+        connector = ArduinoNanoSerialStage1Connector(
+            '/dev/example', baudrate=9600, serial_format='arduino-text')
+        serial_port = Mock()
+        serial_port.in_waiting = 0
+        serial_port.readline.side_effect = [b'-1 cm\n', b'Flow: 0.00 L/min\n',
+                                            b'8 cm\n', b'Flow: 7.50 L/min\n']
+        connector._serial = serial_port
+        self.assertEqual(connector.read_state()['distance_cm'], 8.0)
+        serial_port.readline.side_effect = [b'-1 cm\n', b'Flow: 0.00 L/min\n', b'']
+        with self.assertRaisesRegex(ValueError, 'only no-echo'):
+            connector.read_state()
+
     def test_nano_original_sketch_rejects_no_echo_and_incomplete_pair(self):
         connector = ArduinoNanoSerialStage1Connector(
             '/dev/example', empty_distance_mm=100, serial_format='arduino-text')
         with self.assertRaisesRegex(ValueError, 'no-echo'):
             connector._decode_arduino_pair(b'Distance: 99 cm\n', b'Flow: 0.00 L/min\n')
+        with self.assertRaisesRegex(ValueError, 'no-echo'):
+            connector._decode_arduino_pair(b'Distance: -1 cm\n', b'Flow: 0.00 L/min\n')
+        with self.assertRaisesRegex(ValueError, 'no-echo'):
+            connector._decode_arduino_pair(b'-1 cm\n', b'Flow: 0.00 L/min\n')
         with self.assertRaisesRegex(ValueError, 'consecutive'):
             connector._decode_arduino_pair(b'Distance: 8 cm\n', b'Flow: bad L/min\n')
         serial_port = Mock()

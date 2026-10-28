@@ -1,0 +1,21 @@
+{
+  "id": "L1-102",
+  "name": "Telemetry missing_flow",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "fault",
+  "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+  "parameters": {
+    "fault": "missing_flow"
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "elapsed_seconds": 0.034297308999157394,
+    "freshness_requirement_seconds": 0.1,
+    "fail_closed": false
+  },
+  "error": null,
+  "elapsed_seconds": 0.04946400500011805,
+  "serial_requests_recorded": 1
+}

@@ -1,0 +1,20 @@
+{
+  "id": "L1-098",
+  "name": "Safe pump 20 OFF at 50 mm",
+  "area": "boundary",
+  "category": "benign",
+  "kind": "normal",
+  "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+  "parameters": {
+    "level": 50.0,
+    "register": 20,
+    "value": 0,
+    "steps": 1
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.09492674000102852,
+  "serial_requests_recorded": 1
+}

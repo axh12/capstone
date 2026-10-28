@@ -9,6 +9,7 @@ import pandas as pd
 
 
 RESEARCH_STATE_FEATURES = ["LIT101", "FIT101", "FIT201", "LIT301", "FIT301"]
+STAGE1_ONLY_FEATURES = ['LIT101', 'FIT101']
 RESEARCH_PROCESS_FEATURES = [*RESEARCH_STATE_FEATURES, "AIT202_pH"]
 SWAT_AGGREGATE_FEATURES = [
     'packet_count', 'total_bytes', 'bytes_per_sec', 'packets_per_sec',
@@ -45,6 +46,18 @@ def prepare_swat_stage1(data: pd.DataFrame) -> pd.DataFrame:
     return prepared
 
 
+def prepare_swat_stage1_only(data):
+    columns = {'LIT101.Pv': 'LIT101', 'FIT101.Pv': 'FIT101'}
+    required = {'t_stamp', 'y_true', *columns}
+    if not required <= set(data.columns):
+        raise ValueError('Missing Stage-1-only SWaT columns')
+    prepared = data[['t_stamp', 'y_true', *columns]].rename(columns=columns).copy()
+    prepared[STAGE1_ONLY_FEATURES] = prepared[STAGE1_ONLY_FEATURES].apply(pd.to_numeric, errors='raise')
+    if not np.isfinite(prepared[STAGE1_ONLY_FEATURES].to_numpy(dtype=float)).all():
+        raise ValueError('Stage-1-only features must be finite')
+    return prepared
+
+
 def prepare_swat_process(data: pd.DataFrame) -> pd.DataFrame:
     """Add the Stage 2 pH sensor affected by the Twin's dosing pump."""
     prepared = prepare_swat_stage1(data)
@@ -76,6 +89,17 @@ def prepare_swat_aligned(data: pd.DataFrame) -> pd.DataFrame:
 
 def initialize_twin_from_training_reference(twin, reference: dict) -> None:
     """Place the simulated plant near the historical training operating point."""
+    if twin.params.stage1_topology == 'swat_stage1':
+        if (set(reference) != set(STAGE1_ONLY_FEATURES)
+                or any(not np.isfinite(v) or v < 0 for v in reference.values())
+                or reference['LIT101'] > twin.params.max_level_mm['lit101']):
+            raise ValueError('Invalid Stage-1-only training reference')
+        twin.state.lit101 = reference['LIT101']
+        twin.state.fit101 = reference['FIT101']
+        twin.state.mv101 = int(reference['FIT101'] > 0)
+        twin.state.p101 = 0
+        twin.state.p102 = 0
+        return
     if set(reference) not in (set(RESEARCH_STATE_FEATURES), set(RESEARCH_PROCESS_FEATURES)):
         raise ValueError("Incomplete SWaT process training reference")
     if any(not np.isfinite(value) or value < 0 for value in reference.values()):

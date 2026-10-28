@@ -1,0 +1,21 @@
+{
+  "id": "L1-043",
+  "name": "Telemetry partial",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "fault",
+  "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+  "parameters": {
+    "fault": "partial"
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "elapsed_seconds": 0.023758416000418947,
+    "freshness_requirement_seconds": 0.1,
+    "fail_closed": false
+  },
+  "error": null,
+  "elapsed_seconds": 0.042685474998506834,
+  "serial_requests_recorded": 1
+}

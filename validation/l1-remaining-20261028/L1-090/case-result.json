@@ -1,0 +1,26 @@
+{
+  "id": "L1-090",
+  "name": "Empty/very-low tank pump 20 ON at 0 mm",
+  "area": "process",
+  "category": "malicious",
+  "kind": "hazard",
+  "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+  "parameters": {
+    "level": 0.0,
+    "register": 20,
+    "pumps": 0,
+    "limit": "low"
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "detected": false,
+    "prevention_passed": true,
+    "minimum_level_mm": 0.0,
+    "spill_m3": 0.0,
+    "low_level_limit_mm": 100.0
+  },
+  "error": null,
+  "elapsed_seconds": 0.9966422460001922,
+  "serial_requests_recorded": 8
+}

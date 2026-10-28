@@ -1,0 +1,17 @@
+{
+  "id": "L1-081",
+  "name": "Rule export filesystem failure",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "export_failure",
+  "criterion": "Rule-file I/O failure is reported and does not bypass the command block.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "export_error_reported": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.08781027400073071,
+  "serial_requests_recorded": 1
+}

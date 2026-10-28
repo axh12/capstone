@@ -1,0 +1,21 @@
+{
+  "id": "L1-046",
+  "name": "Telemetry nonnumeric",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "fault",
+  "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+  "parameters": {
+    "fault": "nonnumeric"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "elapsed_seconds": 0.0011215760005143238,
+    "freshness_requirement_seconds": 0.1,
+    "fail_closed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.0369904500003031,
+  "serial_requests_recorded": 1
+}

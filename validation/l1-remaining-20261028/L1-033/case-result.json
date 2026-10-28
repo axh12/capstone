@@ -1,0 +1,24 @@
+{
+  "id": "L1-033",
+  "name": "Flow reported while inlet closed",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "spoof",
+  "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+  "parameters": {
+    "overrides": {
+      "FIT101": 4.37
+    },
+    "register": 110,
+    "steps": 1
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "prevention_passed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.12900382400039234,
+  "serial_requests_recorded": 1
+}

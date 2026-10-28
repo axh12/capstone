@@ -1,0 +1,21 @@
+{
+  "id": "L1-047",
+  "name": "Telemetry nan",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "fault",
+  "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+  "parameters": {
+    "fault": "nan"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "elapsed_seconds": 0.0029948009996587643,
+    "freshness_requirement_seconds": 0.1,
+    "fail_closed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.02758490499945765,
+  "serial_requests_recorded": 1
+}

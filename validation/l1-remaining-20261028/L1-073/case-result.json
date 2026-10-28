@@ -1,0 +1,17 @@
+{
+  "id": "L1-073",
+  "name": "Rule selectivity different_value",
+  "area": "rules",
+  "category": "benign",
+  "kind": "rule",
+  "criterion": "Generated command signature blocks the designated replay while the declared unrelated safe command passes.",
+  "parameters": {
+    "mode": "different_value"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.37754622499960533,
+  "serial_requests_recorded": 2
+}

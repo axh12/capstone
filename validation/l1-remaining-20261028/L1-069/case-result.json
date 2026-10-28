@@ -1,0 +1,23 @@
+{
+  "id": "L1-069",
+  "name": "Legitimate concurrent clients",
+  "area": "traffic",
+  "category": "benign",
+  "kind": "traffic",
+  "criterion": "All valid requests reach SCADA with correct transaction IDs and source-isolated windows; no connection errors.",
+  "parameters": {
+    "pattern": "concurrent"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "requests": 20,
+    "forwarded": 20,
+    "model_or_guard_alarm": false,
+    "source_windows_isolated": true,
+    "max_response_seconds": 0.7760404320015368
+  },
+  "error": null,
+  "elapsed_seconds": 1.7347012879999966,
+  "serial_requests_recorded": 0
+}

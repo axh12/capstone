@@ -1,0 +1,20 @@
+{
+  "id": "L1-097",
+  "name": "Safe pump 24 OFF at 0 mm",
+  "area": "boundary",
+  "category": "benign",
+  "kind": "normal",
+  "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+  "parameters": {
+    "level": 0.0,
+    "register": 24,
+    "value": 0,
+    "steps": 1
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.09406758899967826,
+  "serial_requests_recorded": 1
+}

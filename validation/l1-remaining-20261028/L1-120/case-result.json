@@ -1,0 +1,21 @@
+{
+  "id": "L1-120",
+  "name": "Modbus p102_value65535",
+  "area": "protocol",
+  "category": "malicious",
+  "kind": "protocol",
+  "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+  "parameters": {
+    "mode": "p102_value65535"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "protocol_rejected": true,
+    "valid_followup_allowed": true,
+    "rejection_layer": "protocol validation; not ML"
+  },
+  "error": null,
+  "elapsed_seconds": 0.1080125999997108,
+  "serial_requests_recorded": 2
+}

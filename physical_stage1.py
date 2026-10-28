@@ -1,13 +1,14 @@
-"""Read-only Stage-1 synchronization adapters.
+"""Stage-1 telemetry adapters and an explicit Nano pump-1 command adapter.
 
-No method in this module writes to the physical plant. External/attacker
-commands therefore cannot be forwarded through this interface.
+Telemetry reads are the default. Physical writes require the separate
+ArduinoNanoModbusForwarder and matching firmware acknowledgements.
 """
 from __future__ import annotations
 
 import json
 import math
 import re
+import struct
 import threading
 import time
 from typing import Any, Dict, Protocol
@@ -31,7 +32,8 @@ class ArduinoNanoSerialStage1Connector:
     two-line ``Distance: N cm`` / ``Flow: N L/min`` output is supported by
     ``serial_format='arduino-text'``. Optional JSON
     binary ``inlet_pump_on`` / ``outlet_pump_on`` report physical relay state.
-    Serial input is read-only: this connector never sends commands to Nano.
+    Telemetry reads do not send commands. ``command_pump1`` is used only by
+    the explicit physical-forwarding mode.
     """
 
     def __init__(self, device: str, empty_distance_mm: float | None = None, baudrate: int = 115200,
@@ -52,6 +54,36 @@ class ArduinoNanoSerialStage1Connector:
         self.serial_format = serial_format
         self._serial = None
         self._lock = threading.RLock()
+        self._command_sequence = 0
+
+    def _open_serial(self) -> None:
+        if self._serial is None:
+            import serial
+            self._serial = serial.Serial(self.device, baudrate=self.baudrate,
+                                         timeout=self.timeout_seconds)
+
+    def command_pump1(self, value: int) -> None:
+        """Request a timed pump-1 override; return only after the Nano acknowledges it."""
+        if type(value) is not int or value not in (0, 1):
+            raise ValueError('Pump 1 command must be 0 or 1')
+        with self._lock:
+            self._open_serial()
+            self._command_sequence = (self._command_sequence + 1) % 65536
+            sequence = self._command_sequence
+            self._serial.write(f'P1 {sequence} {value}\n'.encode('ascii'))
+            self._serial.flush()
+            expected = f'ACK P1 {sequence} {value}'
+            deadline = time.monotonic() + self.timeout_seconds
+            while time.monotonic() < deadline:
+                line = self._serial.readline()
+                if not line:
+                    continue
+                response = line.decode('ascii', errors='replace').strip()
+                if response == expected:
+                    return
+                if response.startswith(f'ERR P1 {sequence} '):
+                    raise RuntimeError(f'Nano rejected pump 1 command: {response}')
+            raise TimeoutError('Nano did not acknowledge pump 1 command')
 
     def _decode(self, line: bytes) -> Dict[str, float | int]:
         try:
@@ -103,13 +135,15 @@ class ArduinoNanoSerialStage1Connector:
             flow_text = flow_line.decode('ascii').strip()
         except UnicodeDecodeError as error:
             raise ValueError('Malformed Nano text telemetry') from error
-        distance_match = re.fullmatch(r'Distance:\s*(\d+)\s*cm', distance_text)
+        distance_match = re.fullmatch(r'(?:(?:Distance|istance|stance):\s*)?(-?\d+)\s*cm', distance_text)
         flow_match = re.fullmatch(r'Flow:\s*(\d+(?:\.\d+)?)\s*L/min', flow_text)
         if distance_match is None or flow_match is None:
             raise ValueError('Expected consecutive Nano distance and flow lines')
         distance_cm = int(distance_match.group(1))
-        if distance_cm == 99:
-            raise ValueError('Nano ultrasonic sensor returned its no-echo sentinel (99 cm)')
+        if distance_cm in (-1, 99):
+            raise ValueError('Nano ultrasonic sensor returned a no-echo reading')
+        if distance_cm < 0:
+            raise ValueError('Nano distance must be nonnegative')
         flow_lpm = float(flow_match.group(1))
         if self.empty_distance_mm is None:
             return {'distance_cm': float(distance_cm), 'FIT201': flow_lpm * 0.06}
@@ -122,32 +156,56 @@ class ArduinoNanoSerialStage1Connector:
 
     def read_state(self) -> Dict[str, float | int]:
         with self._lock:
-            if self._serial is None:
-                import serial
-                self._serial = serial.Serial(self.device, baudrate=self.baudrate,
-                                             timeout=self.timeout_seconds)
+            self._open_serial()
             deadline = time.monotonic() + self.timeout_seconds
             latest = None
             distance_line = None
+            saw_no_echo = False
+            malformed_line = None
             while time.monotonic() < deadline:
                 line = self._serial.readline()
                 if not line:
                     break
+                if self.serial_format == 'arduino-text' and not line.strip():
+                    continue
+                if self.serial_format == 'arduino-text' and line.startswith((b'ACK P1 ', b'ERR P1 ')):
+                    continue
                 if self.serial_format == 'json':
                     latest = self._decode(line)
                     if not getattr(self._serial, 'in_waiting', 0):
                         return latest
-                elif line.startswith(b'Distance:'):
+                elif (line.startswith((b'Distance:', b'istance:', b'stance:'))
+                      or re.fullmatch(rb'-?\d+\s*cm\s*', line)):
                     distance_line = line
                 elif line.startswith(b'Flow:') and distance_line is not None:
-                    latest = self._decode_arduino_pair(distance_line, line)
+                    try:
+                        latest = self._decode_arduino_pair(distance_line, line)
+                    except ValueError as error:
+                        if 'no-echo' not in str(error):
+                            raise
+                        saw_no_echo = True
+                        distance_line = None
+                        continue
                     if not getattr(self._serial, 'in_waiting', 0):
                         return latest
                     distance_line = None
+                elif line.startswith(b'Flow:') and distance_line is None:
+                    # A serial connection can start between the two lines of
+                    # a sample. Wait for the next complete distance/flow pair.
+                    continue
                 else:
-                    raise ValueError('Unexpected Nano text telemetry line')
+                    # A USB reconnection or a read timeout can leave a partial
+                    # text line in the stream. Discard it and wait for a fresh
+                    # Distance/Flow pair; never turn a fragment into state.
+                    malformed_line = line[:80]
+                    distance_line = None
+                    continue
             if latest is not None:
                 return latest
+            if saw_no_echo:
+                raise ValueError('Nano ultrasonic sensor returned only no-echo readings')
+            if malformed_line is not None:
+                raise ValueError(f'Unexpected Nano text telemetry line: {malformed_line!r}')
             raise TimeoutError('No Nano telemetry received over serial')
 
     def close(self) -> None:
@@ -155,6 +213,35 @@ class ArduinoNanoSerialStage1Connector:
             if self._serial is not None:
                 self._serial.close()
                 self._serial = None
+
+
+class ArduinoNanoModbusForwarder:
+    """Forward only the rig's supported pump-1 write over the shared serial link.
+
+    The Nano has no Modbus server. An acknowledged serial command is converted
+    to a Modbus FC06 success echo; every other function/register is rejected.
+    """
+
+    def __init__(self, connector: ArduinoNanoSerialStage1Connector):
+        self.connector = connector
+
+    def __call__(self, request: bytes) -> bytes:
+        if len(request) != 12 or request[7] != 6:
+            function = request[7] if len(request) > 7 else 0
+            return self._exception(request, function, 1)
+        register, value = struct.unpack('>HH', request[8:12])
+        if register != 30:
+            return self._exception(request, 6, 2)
+        if value not in (0, 1):
+            return self._exception(request, 6, 3)
+        self.connector.command_pump1(value)
+        return request
+
+    @staticmethod
+    def _exception(request: bytes, function: int, code: int) -> bytes:
+        if len(request) < 7:
+            raise ValueError('Truncated Modbus request')
+        return request[:4] + struct.pack('>H', 3) + request[6:7] + bytes([function | 0x80, code])
 
 
 class ModbusReadOnlyStage1Connector:

@@ -1,0 +1,21 @@
+{
+  "id": "L1-104",
+  "name": "Telemetry positive_infinity",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "fault",
+  "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+  "parameters": {
+    "fault": "positive_infinity"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "elapsed_seconds": 0.0010828240010596346,
+    "freshness_requirement_seconds": 0.1,
+    "fail_closed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.025311186000180896,
+  "serial_requests_recorded": 1
+}

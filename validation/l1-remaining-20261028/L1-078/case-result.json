@@ -1,0 +1,18 @@
+{
+  "id": "L1-078",
+  "name": "Durable replay protection after restart",
+  "area": "rules",
+  "category": "malicious",
+  "kind": "restart_rule",
+  "criterion": "Previously quarantined command remains withheld after gateway restart at the normal operating point.",
+  "parameters": {},
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "rule_file_retained": true,
+    "replay_blocked": false
+  },
+  "error": null,
+  "elapsed_seconds": 0.37770917199850373,
+  "serial_requests_recorded": 2
+}

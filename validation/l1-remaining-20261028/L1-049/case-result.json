@@ -1,0 +1,23 @@
+{
+  "id": "L1-049",
+  "name": "Level residual boundary 4.99 mm",
+  "area": "boundary",
+  "category": "benign",
+  "kind": "normal",
+  "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+  "parameters": {
+    "level": 740.0,
+    "register": 20,
+    "value": 0,
+    "steps": 1,
+    "overrides": {
+      "LIT101": 744.99
+    }
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.08996354599912593,
+  "serial_requests_recorded": 1
+}

@@ -1,0 +1,26 @@
+{
+  "id": "L1-020",
+  "name": "Low-level forced register 20 ON at 99 mm",
+  "area": "process",
+  "category": "malicious",
+  "kind": "hazard",
+  "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+  "parameters": {
+    "level": 99.0,
+    "register": 20,
+    "pumps": 0,
+    "limit": "low"
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "detected": false,
+    "prevention_passed": false,
+    "minimum_level_mm": 95.55,
+    "spill_m3": 0.0,
+    "low_level_limit_mm": 100.0
+  },
+  "error": null,
+  "elapsed_seconds": 0.8739672730007442,
+  "serial_requests_recorded": 8
+}

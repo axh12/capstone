@@ -1,0 +1,20 @@
+{
+  "id": "L1-089",
+  "name": "L1 register 30 readback",
+  "area": "normal",
+  "category": "benign",
+  "kind": "readback",
+  "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+  "parameters": {
+    "register": 30
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "expected": 0,
+    "returned": 0
+  },
+  "error": null,
+  "elapsed_seconds": 0.09066145299948403,
+  "serial_requests_recorded": 1
+}

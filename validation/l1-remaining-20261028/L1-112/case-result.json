@@ -1,0 +1,20 @@
+{
+  "id": "L1-112",
+  "name": "Recovery after telemetry nonnumeric",
+  "area": "recovery",
+  "category": "robustness",
+  "kind": "fault_recovery",
+  "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+  "parameters": {
+    "fault": "nonnumeric"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "fault_fail_closed": true,
+    "recovered": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.0854205549985636,
+  "serial_requests_recorded": 2
+}

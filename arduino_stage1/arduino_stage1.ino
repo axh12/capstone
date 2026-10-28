@@ -28,6 +28,65 @@ volatile unsigned long pulseCount = 0;
 float flowRate;
 
 unsigned long lastUpdate = 0;
+int lastValidDistance = -1;
+unsigned long lastValidDistanceAt = 0;
+bool pump1Override = false;
+int pump1Requested = 0;
+unsigned long pump1OverrideAt = 0;
+char serialCommand[32];
+byte serialCommandLength = 0;
+
+
+void handleSerialCommand()
+{
+  unsigned int sequence;
+  unsigned int value;
+  char extra;
+  if(sscanf(serialCommand, "P1 %u %u %c", &sequence, &value, &extra) != 2 || value > 1)
+  {
+    Serial.println("ERR P1 0 FORMAT");
+    return;
+  }
+  if(value == 1 && (distance < 0 || distance <= FULL_DISTANCE))
+  {
+    Serial.print("ERR P1 ");
+    Serial.print(sequence);
+    Serial.println(" SENSOR_OR_FULL");
+    return;
+  }
+  pump1Requested = value;
+  pump1Override = true;
+  pump1OverrideAt = millis();
+  digitalWrite(RELAY, value == 1 ? LOW : HIGH);
+  Serial.print("ACK P1 ");
+  Serial.print(sequence);
+  Serial.print(" ");
+  Serial.println(value);
+}
+
+
+void readSerialCommands()
+{
+  while(Serial.available() > 0)
+  {
+    char incoming = Serial.read();
+    if(incoming == '\r') continue;
+    if(incoming == '\n')
+    {
+      serialCommand[serialCommandLength] = '\0';
+      if(serialCommandLength > 0) handleSerialCommand();
+      serialCommandLength = 0;
+    }
+    else if(serialCommandLength < sizeof(serialCommand) - 1)
+    {
+      serialCommand[serialCommandLength++] = incoming;
+    }
+    else
+    {
+      serialCommandLength = 0;
+    }
+  }
+}
 
 
 
@@ -124,26 +183,33 @@ void loop()
 {
 
   distance = getDistance();
+  if(distance >= 0)
+  {
+    lastValidDistance = distance;
+    lastValidDistanceAt = millis();
+  }
+  readSerialCommands();
 
 
 
   // Pump control
 
-  if(distance < 0)
+  if(pump1Override && millis() - pump1OverrideAt >= 30000UL)
   {
-    digitalWrite(RELAY, HIGH);  // Pump OFF on no echo
+    pump1Override = false;  // A lost gateway cannot hold a relay indefinitely.
   }
 
-
+  if(distance < 0 || distance <= FULL_DISTANCE)
+  {
+    digitalWrite(RELAY, HIGH);  // No echo or full box: pump OFF.
+  }
+  else if(pump1Override)
+  {
+    digitalWrite(RELAY, pump1Requested == 1 ? LOW : HIGH);
+  }
   else if(distance >= EMPTY_DISTANCE)
   {
     digitalWrite(RELAY, LOW);   // Pump ON
-  }
-
-
-  else if(distance <= FULL_DISTANCE)
-  {
-    digitalWrite(RELAY, HIGH);  // Pump OFF
   }
 
 
@@ -182,23 +248,34 @@ void loop()
 
     lcd.clear();
 
-
     lcd.setCursor(0,0);
-    lcd.print("Level:");
-    lcd.print(distance);
-    lcd.print("cm");
-
-
+    lcd.print("Distance:");
+    if(distance >= 0)
+    {
+      lcd.print(distance);
+      lcd.print(" cm");
+    }
+    else if(lastValidDistance >= 0 && millis() - lastValidDistanceAt <= 3000UL)
+    {
+      lcd.print(lastValidDistance);
+      lcd.print(" cm*");  // * marks a held reading, not a new measurement
+    }
+    else
+    {
+      lcd.print("NO ECHO");
+    }
 
     lcd.setCursor(0,1);
     lcd.print("Flow:");
     lcd.print(flowRate,1);
-    lcd.print("L/m");
+    lcd.print(" L/m");
 
 
 
     lastUpdate = millis();
 
   }
+
+  delay(70);  // Leave the ultrasonic echo time before the next trigger.
 
 }

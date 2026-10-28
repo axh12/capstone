@@ -1,0 +1,24 @@
+{
+  "id": "L1-029",
+  "name": "False high inlet flow",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "spoof",
+  "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+  "parameters": {
+    "overrides": {
+      "FIT101": 30.0
+    },
+    "register": 110,
+    "steps": 1
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "prevention_passed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.050928227999975206,
+  "serial_requests_recorded": 1
+}

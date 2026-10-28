@@ -33,11 +33,14 @@ class PlantState:
 
     # Actuators (0/1)
     p101: int = 0
+    p102: int = 0
     mv101: int = 0
     p201: int = 0
     p203: int = 0
     mv201: int = 0
     p301: int = 0
+    # Independent simulation oracle; excluded from the detector snapshot.
+    stage1_spill_m3: float = 0.0
 
 
 @dataclass
@@ -53,6 +56,7 @@ class PhysicsParams:
     # and tank_area_m2 with measurements from the physical Stage 1 rig.
     stage1_inlet_flow_m3h: float = 4.37
     stage1_pump_flow_m3h: float = 2.33
+    flow_noise_m3h: float = 0.05
     tank_area_m2: Dict[str, float] = field(
         default_factory=lambda: {
             "lit101": 2.0,
@@ -72,7 +76,7 @@ class PhysicsParams:
 class PhysicsEngine:
     def __init__(self, params: PhysicsParams | None = None):
         self.params = params or PhysicsParams()
-        if self.params.stage1_topology not in ("swat", "three_tank_transfer"):
+        if self.params.stage1_topology not in ("swat", "swat_stage1", "three_tank_transfer"):
             raise ValueError("Unknown Stage 1 topology")
         if self.params.dt_seconds <= 0 or any(area <= 0 for area in self.params.tank_area_m2.values()):
             raise ValueError("Physics timestep and tank areas must be positive")
@@ -86,6 +90,9 @@ class PhysicsEngine:
 
     def apply_actions(self, actions: Dict[str, int]) -> None:
         """Apply binary actuator commands from a controller."""
+        if (self.params.stage1_topology == 'swat_stage1'
+                and not set(actions) <= {'p101', 'p102', 'mv101'}):
+            raise ValueError('Stage-1-only plant accepts P101, P102 and MV101 actions')
         for key, value in actions.items():
             if hasattr(self.state, key):
                 setattr(self.state, key, 1 if int(value) else 0)
@@ -110,6 +117,20 @@ class PhysicsEngine:
 
         def clamp_level(tank_key: str, level: float) -> float:
             return max(0.0, min(self.params.max_level_mm[tank_key], level))
+
+        if self.params.stage1_topology == 'swat_stage1':
+            s.fit101 = (max(0., self.params.stage1_inlet_flow_m3h
+                            + noise(self.params.flow_noise_m3h))
+                        if s.mv101 else 0.)
+            # P102 is the standby transfer pump. Its equal capacity is an
+            # explicit mock assumption, not a new historical sensor.
+            outlet = (self.params.stage1_pump_flow_m3h * (s.p101 + s.p102)
+                      if s.lit101 > 50 else 0.)
+            candidate = s.lit101 + level_delta_mm(s.fit101 - outlet, 'lit101')
+            s.stage1_spill_m3 += (max(0., candidate - self.params.max_level_mm['lit101'])
+                                  * self.params.tank_area_m2['lit101'] / 1000.)
+            s.lit101 = clamp_level('lit101', candidate)
+            return self.snapshot()
 
         if self.params.stage1_topology == "three_tank_transfer":
             # Box 1 (LIT201) supplies box 2 (LIT101); the manual outlet pump
@@ -168,11 +189,12 @@ class PhysicsEngine:
 
         # Stage 1: MV101/FIT101 fill T101; P101 drains it to Stage 2.
         # MV101 may map to an inlet pump on a reduced physical rig.
-        s.fit101 = (max(0.0, self.params.stage1_inlet_flow_m3h + noise(0.05))
+        flow_noise = self.params.flow_noise_m3h
+        s.fit101 = (max(0.0, self.params.stage1_inlet_flow_m3h + noise(flow_noise))
                     if s.mv101 == 1 and s.lit101 < self.params.max_level_mm["lit101"]
                     else 0.0)
         inflow_101 = level_delta_mm(s.fit101, "lit101")
-        outflow_101_rate = (max(0.0, self.params.stage1_pump_flow_m3h + noise(0.05))
+        outflow_101_rate = (max(0.0, self.params.stage1_pump_flow_m3h + noise(flow_noise))
                             if s.p101 == 1 and s.lit101 > 50 else 0.0)
         outflow_101 = level_delta_mm(outflow_101_rate, "lit101")
         s.lit101 = clamp_level("lit101", s.lit101 + inflow_101 - outflow_101)
@@ -206,6 +228,9 @@ class PhysicsEngine:
 
     def snapshot(self) -> Dict[str, float]:
         s = self.state
+        if self.params.stage1_topology == 'swat_stage1':
+            return {'LIT101': round(s.lit101, 2), 'FIT101': round(s.fit101, 3),
+                    'p101': s.p101, 'p102': s.p102, 'mv101': s.mv101}
         state = {
             "LIT101": round(s.lit101, 2),
             "LIT201": round(s.lit201, 2),

@@ -1,0 +1,24 @@
+{
+  "id": "L1-039",
+  "name": "Frozen level during filling",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "frozen",
+  "criterion": "Detect the frozen level while delivered commands change actual tank level.",
+  "parameters": {
+    "register": 30,
+    "level": 600.0
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "unrelated_command_blocked": false,
+    "actual_level": 613.54,
+    "twin_level": 600.0,
+    "residual_after_sequence_mm": 13.539999999999964
+  },
+  "error": null,
+  "elapsed_seconds": 2.498179217998768,
+  "serial_requests_recorded": 16
+}

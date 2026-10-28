@@ -1,0 +1,17 @@
+{
+  "id": "L1-080",
+  "name": "Mock SCADA disconnect",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "downstream",
+  "criterion": "Unavailable SCADA returns an error, with no forwarding and no committed Twin actuator change.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "state_rolled_back": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.2039481940009864,
+  "serial_requests_recorded": 1
+}

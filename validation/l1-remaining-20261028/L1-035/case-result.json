@@ -1,0 +1,32 @@
+{
+  "id": "L1-035",
+  "name": "Slow bias LIT101 -2 per observation",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "drift",
+  "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+  "parameters": {
+    "field": "LIT101",
+    "delta": -2.0
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "detected": false,
+    "first_block_step": null,
+    "final_observed": {
+      "LIT101": 699.4,
+      "FIT101": 0.0
+    },
+    "actual": {
+      "LIT101": 739.4,
+      "FIT101": 0.0,
+      "p101": 0,
+      "p102": 0,
+      "mv101": 0
+    }
+  },
+  "error": null,
+  "elapsed_seconds": 2.65970717700111,
+  "serial_requests_recorded": 20
+}

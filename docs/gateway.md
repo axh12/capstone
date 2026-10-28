@@ -1,7 +1,8 @@
 # Inline Modbus gateway
 
-The research VM uses mock SCADA because the physical rig is not yet connected
-to the gateway. Its confirmed layout is **box 1 (stored water) → automatic
+The default research runner uses mock SCADA. An optional physical-forwarding
+mode is implemented for the updated Nano sketch, but has not yet been verified
+on the rig. Its confirmed layout is **box 1 (stored water) → automatic
 pump 1 → box 2 (ultrasonic level sensor) → manually switched pump 2 and flow
 sensor → box 3**. Pump 1 turns on below a lower box-2 level and stops at the
 full threshold; pump 2 runs from a separate switch. The LCD displays box-2
@@ -84,9 +85,20 @@ The repository copy at `arduino_stage1/arduino_stage1.ino` returns -1 cm and
 turns pump 1 off on no echo; the bridge rejects either invalid reading.
 The flow sensor is on interrupt pin 2 and the sketch reports pulses / 7.5 as
 L/min. Pump 2 is operated by a manual switch; the sketch reports neither that
-switch's position nor either relay state. The LCD uses the same distance and
-flow values that serial prints. Its `Level:` label currently displays
-**sensor-to-water distance**, not water depth.
+switch's position nor either relay state. The LCD's `Level:` label displays
+**sensor-to-water distance**, not water depth. A missed echo still prints
+`Distance: -1 cm` on serial and turns pump 1 off. The LCD instead holds the
+last valid distance for up to three seconds and adds `*` to mark it as held;
+a longer outage displays `NO ECHO`, so an old value is not shown indefinitely.
+The sketch keeps the original `lcd.clear()` and cursor layout.
+The repository sketch also spaces ultrasonic readings by 70 ms and accepts
+`P1 <sequence> <0|1>` on the same 9600-baud serial connection. It responds
+`ACK P1 <sequence> <value>` after setting pump 1's relay, or
+`ERR P1 <sequence> SENSOR_OR_FULL` when ON is unsafe. The override lasts at
+most 30 seconds before automatic 8/2 cm control resumes. No echo or a full
+box turns pump 1 off even during an override. Pump 2 remains manual. These
+firmware changes require uploading the repository sketch; the flow calculation
+and LCD layout are unchanged.
 
 Use the current sketch without reflashing by setting its format and baud:
 
@@ -95,6 +107,39 @@ dt-venv/bin/python run_mock_lab.py --plant-topology three_tank_transfer \
   --stage1-serial /dev/serial/by-id/YOUR_NANO \
   --stage1-serial-format arduino-text --stage1-baud 9600
 ```
+
+Before starting the gateway, verify that the USB passthrough and serial
+telemetry work. Close Arduino IDE's Serial Monitor so it does not hold the
+port, then run this on the Ubuntu VM (replace the device path with the entry
+shown by `ls -l /dev/serial/by-id/` or use `/dev/ttyUSB0`):
+
+```sh
+dt-venv/bin/python run_mock_lab.py --plant-topology three_tank_transfer \
+  --stage1-serial /dev/serial/by-id/YOUR_NANO \
+  --stage1-serial-format arduino-text --stage1-baud 9600 \
+  --stage1-probe
+```
+
+The probe prints five `measured` records, the corresponding `twin_state`
+snapshots, and a one-step `simulated_next_state` for each sample. It then
+exits without opening the gateway or applying Snort rules.
+If the sensor briefly returns no echo, the probe marks that sample invalid
+and continues; it never inserts the invalid reading into the Twin.
+`distance_cm` and `FIT201` come from the physical rig; other Twin fields
+remain simulated unless separately measured and calibrated. Once the probe
+works, omit `--stage1-probe` to refresh the Twin continuously and before each
+gateway decision. A `Distance: -1 cm` no-echo reading is rejected rather than
+used as a water level.
+The attached FTDI device has also been observed printing just `-1 cm` without
+the `Distance:` prefix. The bridge accepts either prefix format, but `-1 cm`
+still means the ultrasonic sensor reported no echo. Occasional no-echo samples
+and blank separator lines are skipped; if no valid distance arrives before the serial read times out,
+the probe reports an invalid sample and the gateway does not forward a command. Check the
+sensor/wiring and get a valid nonnegative reading before relying on the live
+Twin state.
+The live port has also emitted `stance: -1 cm`, with the initial `Di` missing.
+The parser accepts this exact prefix loss to recover the numeric reading;
+repeated prefix loss should still be investigated on the Nano serial link.
 
 Without an empty-distance reference, the bridge sends `distance_cm` and
 `FIT201` to the Twin and does **not** manufacture a measured `LIT101` depth.
@@ -105,32 +150,78 @@ stable reference is measured later, optionally pass `--empty-distance-mm`;
 the bridge then also computes `water_depth_mm = empty_distance_mm - 10 *
 displayed_distance_cm`. The 8/2 cm switch points are not tank depths.
 The 7.5 flow-pulse factor and all Twin tank areas/pump rates still require
-calibration on the physical hardware. This read-only bridge does not change
-the Arduino sketch or control the relays. The existing mock SCADA remains the
-gateway's downstream destination; forwarding to Nano requires a separate
-command protocol and verified relay wiring.
+calibration on the physical hardware. By default the serial bridge only reads
+telemetry and mock SCADA remains the downstream destination. The explicit
+`--physical-forward` mode instead sends allowed FC06 register-30 pump-1 writes
+to the Nano and waits for its matching acknowledgement. It rejects register
+20 (manual pump 2) and all other physical writes. The mode requires a model
+calibrated for `three_tank_transfer` plus `--ensemble-only`; the existing SWaT
+model does not qualify. It does not start mock SCADA.
+
+After uploading the updated sketch and training a rig-specific model, the
+physical-forwarding runner is:
+
+```sh
+dt-venv/bin/python run_mock_lab.py --listen-host 192.168.58.105 \
+  --plant-topology three_tank_transfer \
+  --stage1-serial /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-if00-port0 \
+  --stage1-serial-format arduino-text --stage1-baud 9600 \
+  --model validation/rig/detector_candidate.pkl --ensemble-only \
+  --physical-forward --telemetry-file validation/physical-run.jsonl
+```
+
+Use `--deployment-config pfsense-deployment.json` only when the model and
+serial command path have passed local checks. The command above does not
+enable pfSense deployment. Do not run it with the old measurement-only sketch:
+that sketch cannot acknowledge a command, so the gateway will return a
+Modbus device error. The Nano's acknowledgement proves receipt and initial
+relay command, not sustained pump motion or water flow; verify those from the
+physical rig. Normal command expiry and no-echo safety can turn the relay off
+after an acknowledgement.
 
 The bridge refreshes the Twin continuously and again before scoring each
 gateway request. An invalid or missing serial reading causes the request to
-fail rather than forward without physical context. The Nano is not plugged
-into this VM yet; serial parsing and Twin synchronization have been tested
-with synthetic lines only. If the manual pump-2 switch is wired directly to
-its relay, its electrical state needs a separate Nano input; outlet flow alone
-cannot distinguish a stopped pump from a running pump with no water. Before
+fail rather than forward without physical context. A live read-only probe on
+2026-10-23 read five valid Nano samples through the FTDI serial device:
+distances 6, 2, 3, 2, and 3 cm appeared in the Twin's `distance_cm` field;
+`FIT201` was 0.0 throughout because no nonzero outlet flow was observed.
+This verifies the sensor-to-Twin path for those samples, not the trained
+detector or physical command forwarding. A subsequent continuous gateway run
+on the same FTDI link received repeated truncated fragments such as `cm` and
+`L/min`; the serial connector rejected them, so continuous synchronization
+was not verified. A repeat probe returned 0/5 valid samples, all with the
+`L/min` fragment. After reconnecting USB, a later probe read 5/5 valid
+samples at 3 cm. A 30-second read returned 15 valid reads, 5 no-echo errors,
+and 2 timeouts. The LCD `*` holds a prior valid value while raw serial may
+still report `-1`; continuous reliability remains to be verified after the
+updated sketch is uploaded. Pump 2 is operated by a separate
+manual switch, not a Nano relay. Its flow sensor measures box-2-to-box-3 flow,
+but the Nano does not report the switch position; zero flow alone cannot
+distinguish a switched-off pump from a running pump with no water. Before
 `--model --ensemble-only` can be used for this rig, collect normal and labeled attack data from this rig, train and
 calibrate an ensemble for its available sensors, and declare
 `plant_topology=three_tank_transfer` in the artifact. A SWaT-trained ensemble
 is incompatible with this rig's measured sensor schema.
 
-The intended data paths have separate roles: **Nano → Twin is read-only
-telemetry**; **gateway → Twin applies a candidate Modbus command to the
-simulation**; **gateway → physical controller forwards only an allowed
-command**. The gateway now has a downstream-forwarder interface, and a
-regression checks that blocked commands never call it. The Nano serial
-connector remains read-only, and no physical command adapter is configured
-yet because the relay/register mapping and override-release behavior are
-unknown. In the mock lab, allowed requests go to local mock SCADA, not the
-physical pumps or valves.
+A later live gateway check on 2026-10-23 exposed partial serial fragments
+(`0 L/min`) that made reads fail. The text parser now discards incomplete
+fragments and waits for a fresh complete pair; it still rejects no-echo
+readings. A repeat probe then read 5/5 valid pairs at 2 cm with zero outlet
+flow. One local Modbus read reached the gateway, recorded `distance_cm=2.0`,
+and was served by mock SCADA. Subsequent writes were withheld when the Nano
+returned only no-echo samples. The live test used fixed fixture decisions,
+not a trained rig anomaly model, and sent no command to the physical Nano or
+pfSense. The runner uses a 1.5-second serial read budget and one-second
+background polling so sensor failures return a Modbus error before the lab
+client's five-second timeout; this is still not a substitute for reliable
+sensor data.
+
+The intended data paths have separate roles: **Nano → Twin supplies measured
+telemetry**; **gateway → Twin applies a candidate command to the simulation**;
+**gateway → Nano forwards only an allowed pump-1 command in physical mode**.
+Regressions verify that blocked commands never reach the downstream adapter
+and that a downstream rejection rolls back the candidate Twin state. In the
+default mock lab, allowed requests still go to local mock SCADA.
 The gateway currently advances the physics by one fixed tick per command,
 not by wall-clock elapsed time, so this is not yet a continuous-time replica
 of an operating rig. The Stage 1 wiring follows the

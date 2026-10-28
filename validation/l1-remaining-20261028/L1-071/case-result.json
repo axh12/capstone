@@ -1,0 +1,21 @@
+{
+  "id": "L1-071",
+  "name": "Declared malicious read burst",
+  "area": "traffic",
+  "category": "malicious",
+  "kind": "burst_attack",
+  "criterion": "Detect and withhold at least one request in the declared 20-read burst scenario.",
+  "parameters": {},
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "requests": 20,
+    "forwarded": 20,
+    "model_or_guard_alarm": false,
+    "source_windows_isolated": true,
+    "max_response_seconds": 0.034305634999327594
+  },
+  "error": null,
+  "elapsed_seconds": 0.44176541799970437,
+  "serial_requests_recorded": 0
+}

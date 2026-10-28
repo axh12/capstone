@@ -1,0 +1,24 @@
+{
+  "id": "L1-030",
+  "name": "Subtle false level",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "spoof",
+  "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+  "parameters": {
+    "overrides": {
+      "LIT101": 700.0
+    },
+    "register": 100,
+    "steps": 1
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "prevention_passed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.04025003099923197,
+  "serial_requests_recorded": 1
+}

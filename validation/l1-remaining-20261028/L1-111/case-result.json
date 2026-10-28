@@ -1,0 +1,20 @@
+{
+  "id": "L1-111",
+  "name": "Recovery after telemetry disconnected",
+  "area": "recovery",
+  "category": "robustness",
+  "kind": "fault_recovery",
+  "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+  "parameters": {
+    "fault": "disconnected"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "fault_fail_closed": true,
+    "recovered": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.04060475900041638,
+  "serial_requests_recorded": 2
+}

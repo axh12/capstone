@@ -19,3 +19,4 @@ demo_session_*_rules.json
 /validation/
 /artifacts/
 /docs/test-results.txt
+/stage1-demo-last-rejection.json

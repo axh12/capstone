@@ -1,0 +1,1774 @@
+{
+  "policy": "Unchanged Stage1Guard: 60 s, 5 mm, 0.1 m3/h",
+  "low_level_oracle_mm": 100.0,
+  "declared_freshness_requirement_seconds": 0.1,
+  "cases": [
+    {
+      "id": "L1-001",
+      "name": "Normal filling at 550 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 550.0,
+        "register": 30,
+        "steps": 5
+      }
+    },
+    {
+      "id": "L1-002",
+      "name": "Normal filling at 700 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 700.0,
+        "register": 30,
+        "steps": 5
+      }
+    },
+    {
+      "id": "L1-003",
+      "name": "Normal filling at 800 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 800.0,
+        "register": 30,
+        "steps": 5
+      }
+    },
+    {
+      "id": "L1-004",
+      "name": "Normal P101 transfer at 550 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 550.0,
+        "register": 20,
+        "steps": 12
+      }
+    },
+    {
+      "id": "L1-005",
+      "name": "Normal P101 transfer at 740 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 740.0,
+        "register": 20,
+        "steps": 12
+      }
+    },
+    {
+      "id": "L1-006",
+      "name": "Normal P101 transfer at 820 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 820.0,
+        "register": 20,
+        "steps": 12
+      }
+    },
+    {
+      "id": "L1-007",
+      "name": "Normal P102 transfer at 550 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 550.0,
+        "register": 24,
+        "steps": 12
+      }
+    },
+    {
+      "id": "L1-008",
+      "name": "Normal P102 transfer at 740 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 740.0,
+        "register": 24,
+        "steps": 12
+      }
+    },
+    {
+      "id": "L1-009",
+      "name": "Normal P102 transfer at 820 mm",
+      "area": "normal",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 820.0,
+        "register": 24,
+        "steps": 12
+      }
+    },
+    {
+      "id": "L1-010",
+      "name": "Changeover register 20 to 24",
+      "area": "normal",
+      "category": "benign",
+      "kind": "changeover",
+      "criterion": "Both requested duty/standby transitions are acknowledged and applied.",
+      "parameters": {
+        "first": 20,
+        "second": 24
+      }
+    },
+    {
+      "id": "L1-011",
+      "name": "Changeover register 24 to 20",
+      "area": "normal",
+      "category": "benign",
+      "kind": "changeover",
+      "criterion": "Both requested duty/standby transitions are acknowledged and applied.",
+      "parameters": {
+        "first": 24,
+        "second": 20
+      }
+    },
+    {
+      "id": "L1-012",
+      "name": "Safe rapid pump reversals",
+      "area": "normal",
+      "category": "benign",
+      "kind": "reversal",
+      "criterion": "All safe ON/OFF reversals are acknowledged; no stale decisions or spill.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-013",
+      "name": "Overflow near capacity with 0 running pumps",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 1198.0,
+        "register": 30,
+        "pumps": 0,
+        "limit": "high"
+      }
+    },
+    {
+      "id": "L1-014",
+      "name": "Overflow near capacity with 1 running pumps",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 1198.0,
+        "register": 30,
+        "pumps": 1,
+        "limit": "high"
+      }
+    },
+    {
+      "id": "L1-015",
+      "name": "Overflow near capacity with 2 running pumps",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 1198.0,
+        "register": 30,
+        "pumps": 2,
+        "limit": "high"
+      }
+    },
+    {
+      "id": "L1-016",
+      "name": "Inlet opening at capacity boundary 1199.9 mm",
+      "area": "boundary",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 1199.9,
+        "register": 30,
+        "pumps": 0,
+        "limit": "high"
+      }
+    },
+    {
+      "id": "L1-017",
+      "name": "Safe inlet closure at 1199.9 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 1199.9,
+        "register": 30,
+        "steps": 1,
+        "value": 0
+      }
+    },
+    {
+      "id": "L1-018",
+      "name": "Inlet opening at capacity boundary 1200 mm",
+      "area": "boundary",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 1200.0,
+        "register": 30,
+        "pumps": 0,
+        "limit": "high"
+      }
+    },
+    {
+      "id": "L1-019",
+      "name": "Safe inlet closure at 1200 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 1200.0,
+        "register": 30,
+        "steps": 1,
+        "value": 0
+      }
+    },
+    {
+      "id": "L1-020",
+      "name": "Low-level forced register 20 ON at 99 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 99.0,
+        "register": 20,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-021",
+      "name": "Low-level forced register 20 ON at 100 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 100.0,
+        "register": 20,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-022",
+      "name": "Low-level forced register 20 ON at 101 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 101.0,
+        "register": 20,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-023",
+      "name": "Low-level forced register 24 ON at 99 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 99.0,
+        "register": 24,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-024",
+      "name": "Low-level forced register 24 ON at 100 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 100.0,
+        "register": 24,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-025",
+      "name": "Low-level forced register 24 ON at 101 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 101.0,
+        "register": 24,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-026",
+      "name": "Both pumps forced ON near low level",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 101.0,
+        "register": 24,
+        "pumps": 1,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-027",
+      "name": "False low level",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "LIT101": 100.0
+        },
+        "register": 100,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-028",
+      "name": "False high level",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "LIT101": 1100.0
+        },
+        "register": 100,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-029",
+      "name": "False high inlet flow",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "FIT101": 30.0
+        },
+        "register": 110,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-030",
+      "name": "Subtle false level",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "LIT101": 700.0
+        },
+        "register": 100,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-031",
+      "name": "Subtle false flow",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "FIT101": 0.05
+        },
+        "register": 110,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-032",
+      "name": "Persistent false level",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "LIT101": 100.0
+        },
+        "register": 100,
+        "steps": 3
+      }
+    },
+    {
+      "id": "L1-033",
+      "name": "Flow reported while inlet closed",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "FIT101": 4.37
+        },
+        "register": 110,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-034",
+      "name": "Level jump without inlet flow",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "overrides": {
+          "LIT101": 750.0
+        },
+        "register": 100,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-035",
+      "name": "Slow bias LIT101 -2 per observation",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "drift",
+      "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+      "parameters": {
+        "field": "LIT101",
+        "delta": -2.0
+      }
+    },
+    {
+      "id": "L1-036",
+      "name": "Slow bias LIT101 +2 per observation",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "drift",
+      "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+      "parameters": {
+        "field": "LIT101",
+        "delta": 2.0
+      }
+    },
+    {
+      "id": "L1-037",
+      "name": "Slow bias FIT101 +0.02 per observation",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "drift",
+      "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+      "parameters": {
+        "field": "FIT101",
+        "delta": 0.02
+      }
+    },
+    {
+      "id": "L1-038",
+      "name": "Frozen level during pumping",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "frozen",
+      "criterion": "Detect the frozen level while delivered commands change actual tank level.",
+      "parameters": {
+        "register": 20,
+        "level": 740.0
+      }
+    },
+    {
+      "id": "L1-039",
+      "name": "Frozen level during filling",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "frozen",
+      "criterion": "Detect the frozen level while delivered commands change actual tank level.",
+      "parameters": {
+        "register": 30,
+        "level": 600.0
+      }
+    },
+    {
+      "id": "L1-040",
+      "name": "Replay old level after plant changes",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "frozen",
+      "criterion": "Detect the frozen level while delivered commands change actual tank level.",
+      "parameters": {
+        "register": 20,
+        "level": 740.0
+      }
+    },
+    {
+      "id": "L1-041",
+      "name": "Frozen flow after inlet closure",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "frozen_flow",
+      "criterion": "Detect flow frozen at its earlier open-valve value after a valve-close command.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-042",
+      "name": "Telemetry empty",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "empty"
+      }
+    },
+    {
+      "id": "L1-043",
+      "name": "Telemetry partial",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "partial"
+      }
+    },
+    {
+      "id": "L1-044",
+      "name": "Telemetry disconnected",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "disconnected"
+      }
+    },
+    {
+      "id": "L1-045",
+      "name": "Telemetry delayed",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "delayed"
+      }
+    },
+    {
+      "id": "L1-046",
+      "name": "Telemetry nonnumeric",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "nonnumeric"
+      }
+    },
+    {
+      "id": "L1-047",
+      "name": "Telemetry nan",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "nan"
+      }
+    },
+    {
+      "id": "L1-048",
+      "name": "Telemetry out_of_range",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "out_of_range"
+      }
+    },
+    {
+      "id": "L1-049",
+      "name": "Level residual boundary 4.99 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 740.0,
+        "register": 20,
+        "value": 0,
+        "steps": 1,
+        "overrides": {
+          "LIT101": 744.99
+        }
+      }
+    },
+    {
+      "id": "L1-050",
+      "name": "Level residual boundary 5 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 740.0,
+        "register": 20,
+        "value": 0,
+        "steps": 1,
+        "overrides": {
+          "LIT101": 745.0
+        }
+      }
+    },
+    {
+      "id": "L1-051",
+      "name": "Level residual boundary 5.01 mm",
+      "area": "boundary",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "level": 740.0,
+        "register": 100,
+        "steps": 1,
+        "overrides": {
+          "LIT101": 745.01
+        }
+      }
+    },
+    {
+      "id": "L1-052",
+      "name": "Flow residual boundary 0.099 m3/h",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 740.0,
+        "register": 20,
+        "value": 0,
+        "steps": 1,
+        "overrides": {
+          "FIT101": 0.099
+        }
+      }
+    },
+    {
+      "id": "L1-053",
+      "name": "Flow residual boundary 0.1 m3/h",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 740.0,
+        "register": 20,
+        "value": 0,
+        "steps": 1,
+        "overrides": {
+          "FIT101": 0.1
+        }
+      }
+    },
+    {
+      "id": "L1-054",
+      "name": "Flow residual boundary 0.101 m3/h",
+      "area": "boundary",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "level": 740.0,
+        "register": 110,
+        "steps": 1,
+        "overrides": {
+          "FIT101": 0.101
+        }
+      }
+    },
+    {
+      "id": "L1-055",
+      "name": "Modbus unsupported_function",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "unsupported_function"
+      }
+    },
+    {
+      "id": "L1-056",
+      "name": "Modbus invalid_value",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "invalid_value"
+      }
+    },
+    {
+      "id": "L1-057",
+      "name": "Modbus sensor_write",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "sensor_write"
+      }
+    },
+    {
+      "id": "L1-058",
+      "name": "Modbus unknown_register",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "unknown_register"
+      }
+    },
+    {
+      "id": "L1-059",
+      "name": "Modbus zero_read_count",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "zero_read_count"
+      }
+    },
+    {
+      "id": "L1-060",
+      "name": "Modbus excess_read_count",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "excess_read_count"
+      }
+    },
+    {
+      "id": "L1-061",
+      "name": "Modbus other_stage_read",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "other_stage_read"
+      }
+    },
+    {
+      "id": "L1-062",
+      "name": "Modbus bad_protocol",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "bad_protocol"
+      }
+    },
+    {
+      "id": "L1-063",
+      "name": "Modbus bad_length",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "bad_length"
+      }
+    },
+    {
+      "id": "L1-064",
+      "name": "Modbus truncated",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "truncated"
+      }
+    },
+    {
+      "id": "L1-065",
+      "name": "Valid fragmented TCP request",
+      "area": "protocol",
+      "category": "benign",
+      "kind": "fragments",
+      "criterion": "A valid fragmented request is reassembled and forwarded exactly once.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-066",
+      "name": "Two requests on persistent TCP connection",
+      "area": "protocol",
+      "category": "benign",
+      "kind": "persistent_connection",
+      "criterion": "Two valid requests on one TCP connection are independently acknowledged and forwarded.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-067",
+      "name": "Legitimate slow clients",
+      "area": "traffic",
+      "category": "benign",
+      "kind": "traffic",
+      "criterion": "All valid requests reach SCADA with correct transaction IDs and source-isolated windows; no connection errors.",
+      "parameters": {
+        "pattern": "slow"
+      }
+    },
+    {
+      "id": "L1-068",
+      "name": "Legitimate burst clients",
+      "area": "traffic",
+      "category": "benign",
+      "kind": "traffic",
+      "criterion": "All valid requests reach SCADA with correct transaction IDs and source-isolated windows; no connection errors.",
+      "parameters": {
+        "pattern": "burst"
+      }
+    },
+    {
+      "id": "L1-069",
+      "name": "Legitimate concurrent clients",
+      "area": "traffic",
+      "category": "benign",
+      "kind": "traffic",
+      "criterion": "All valid requests reach SCADA with correct transaction IDs and source-isolated windows; no connection errors.",
+      "parameters": {
+        "pattern": "concurrent"
+      }
+    },
+    {
+      "id": "L1-070",
+      "name": "Legitimate multiple_sources clients",
+      "area": "traffic",
+      "category": "benign",
+      "kind": "traffic",
+      "criterion": "All valid requests reach SCADA with correct transaction IDs and source-isolated windows; no connection errors.",
+      "parameters": {
+        "pattern": "multiple_sources"
+      }
+    },
+    {
+      "id": "L1-071",
+      "name": "Declared malicious read burst",
+      "area": "traffic",
+      "category": "malicious",
+      "kind": "burst_attack",
+      "criterion": "Detect and withhold at least one request in the declared 20-read burst scenario.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-072",
+      "name": "Rule selectivity exact",
+      "area": "rules",
+      "category": "malicious",
+      "kind": "rule",
+      "criterion": "Generated command signature blocks the designated replay while the declared unrelated safe command passes.",
+      "parameters": {
+        "mode": "exact"
+      }
+    },
+    {
+      "id": "L1-073",
+      "name": "Rule selectivity different_value",
+      "area": "rules",
+      "category": "benign",
+      "kind": "rule",
+      "criterion": "Generated command signature blocks the designated replay while the declared unrelated safe command passes.",
+      "parameters": {
+        "mode": "different_value"
+      }
+    },
+    {
+      "id": "L1-074",
+      "name": "Rule selectivity different_register",
+      "area": "rules",
+      "category": "benign",
+      "kind": "rule",
+      "criterion": "Generated command signature blocks the designated replay while the declared unrelated safe command passes.",
+      "parameters": {
+        "mode": "different_register"
+      }
+    },
+    {
+      "id": "L1-075",
+      "name": "Rule selectivity different_source",
+      "area": "rules",
+      "category": "malicious",
+      "kind": "rule",
+      "criterion": "Generated command signature blocks the designated replay while the declared unrelated safe command passes.",
+      "parameters": {
+        "mode": "different_source"
+      }
+    },
+    {
+      "id": "L1-076",
+      "name": "Genuine telemetry recovery after sensor alarm",
+      "area": "recovery",
+      "category": "benign",
+      "kind": "recovery",
+      "criterion": "After a rejected falsified reading, restored genuine telemetry is accepted.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-077",
+      "name": "Normal request after gateway restart",
+      "area": "recovery",
+      "category": "robustness",
+      "kind": "restart",
+      "criterion": "A valid request succeeds after actual gateway component restart.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-078",
+      "name": "Durable replay protection after restart",
+      "area": "rules",
+      "category": "malicious",
+      "kind": "restart_rule",
+      "criterion": "Previously quarantined command remains withheld after gateway restart at the normal operating point.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-079",
+      "name": "Rule expiration and quarantine consistency",
+      "area": "rules",
+      "category": "robustness",
+      "kind": "expiry",
+      "criterion": "After explicit rule expiration, a now-safe command is no longer blocked solely by the old quarantine.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-080",
+      "name": "Mock SCADA disconnect",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "downstream",
+      "criterion": "Unavailable SCADA returns an error, with no forwarding and no committed Twin actuator change.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-081",
+      "name": "Rule export filesystem failure",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "export_failure",
+      "criterion": "Rule-file I/O failure is reported and does not bypass the command block.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-082",
+      "name": "Sustained draining detection and recovery",
+      "area": "process",
+      "category": "malicious",
+      "kind": "draining",
+      "criterion": "Detect sustained draining within 300 commands, generate a rule, block exact replay, and allow the identical benign packet afterward. Early allowed attacks are disclosed.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-083",
+      "name": "L1 register 1 readback",
+      "area": "normal",
+      "category": "benign",
+      "kind": "readback",
+      "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+      "parameters": {
+        "register": 1
+      }
+    },
+    {
+      "id": "L1-084",
+      "name": "L1 register 10 readback",
+      "area": "normal",
+      "category": "benign",
+      "kind": "readback",
+      "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+      "parameters": {
+        "register": 10
+      }
+    },
+    {
+      "id": "L1-085",
+      "name": "L1 register 100 readback",
+      "area": "normal",
+      "category": "benign",
+      "kind": "readback",
+      "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+      "parameters": {
+        "register": 100
+      }
+    },
+    {
+      "id": "L1-086",
+      "name": "L1 register 110 readback",
+      "area": "normal",
+      "category": "benign",
+      "kind": "readback",
+      "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+      "parameters": {
+        "register": 110
+      }
+    },
+    {
+      "id": "L1-087",
+      "name": "L1 register 20 readback",
+      "area": "normal",
+      "category": "benign",
+      "kind": "readback",
+      "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+      "parameters": {
+        "register": 20
+      }
+    },
+    {
+      "id": "L1-088",
+      "name": "L1 register 24 readback",
+      "area": "normal",
+      "category": "benign",
+      "kind": "readback",
+      "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+      "parameters": {
+        "register": 24
+      }
+    },
+    {
+      "id": "L1-089",
+      "name": "L1 register 30 readback",
+      "area": "normal",
+      "category": "benign",
+      "kind": "readback",
+      "criterion": "Valid L1 register read is forwarded and returns the independently computed mock value with the matching transaction ID.",
+      "parameters": {
+        "register": 30
+      }
+    },
+    {
+      "id": "L1-090",
+      "name": "Empty/very-low tank pump 20 ON at 0 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 0.0,
+        "register": 20,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-091",
+      "name": "Empty/very-low tank pump 24 ON at 0 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 0.0,
+        "register": 24,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-092",
+      "name": "Empty/very-low tank pump 20 ON at 1 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 1.0,
+        "register": 20,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-093",
+      "name": "Empty/very-low tank pump 24 ON at 1 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 1.0,
+        "register": 24,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-094",
+      "name": "Empty/very-low tank pump 20 ON at 50 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 50.0,
+        "register": 20,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-095",
+      "name": "Empty/very-low tank pump 24 ON at 50 mm",
+      "area": "process",
+      "category": "malicious",
+      "kind": "hazard",
+      "criterion": "At least one BLOCK before spill or depletion below 100 mm; if initially below 100 mm, prevent further depletion. Exact replay withheld.",
+      "parameters": {
+        "level": 50.0,
+        "register": 24,
+        "pumps": 0,
+        "limit": "low"
+      }
+    },
+    {
+      "id": "L1-096",
+      "name": "Safe pump 20 OFF at 0 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 0.0,
+        "register": 20,
+        "value": 0,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-097",
+      "name": "Safe pump 24 OFF at 0 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 0.0,
+        "register": 24,
+        "value": 0,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-098",
+      "name": "Safe pump 20 OFF at 50 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 50.0,
+        "register": 20,
+        "value": 0,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-099",
+      "name": "Safe pump 24 OFF at 50 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 50.0,
+        "register": 24,
+        "value": 0,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-100",
+      "name": "Safe pump 20 OFF at 100 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 100.0,
+        "register": 20,
+        "value": 0,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-101",
+      "name": "Safe pump 24 OFF at 100 mm",
+      "area": "boundary",
+      "category": "benign",
+      "kind": "normal",
+      "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+      "parameters": {
+        "level": 100.0,
+        "register": 24,
+        "value": 0,
+        "steps": 1
+      }
+    },
+    {
+      "id": "L1-102",
+      "name": "Telemetry missing_flow",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "missing_flow"
+      }
+    },
+    {
+      "id": "L1-103",
+      "name": "Telemetry null",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "null"
+      }
+    },
+    {
+      "id": "L1-104",
+      "name": "Telemetry positive_infinity",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "positive_infinity"
+      }
+    },
+    {
+      "id": "L1-105",
+      "name": "Telemetry negative_infinity",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "negative_infinity"
+      }
+    },
+    {
+      "id": "L1-106",
+      "name": "Telemetry negative_level",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "negative_level"
+      }
+    },
+    {
+      "id": "L1-107",
+      "name": "Telemetry negative_flow",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "negative_flow"
+      }
+    },
+    {
+      "id": "L1-108",
+      "name": "Telemetry infinite_flow",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "infinite_flow"
+      }
+    },
+    {
+      "id": "L1-109",
+      "name": "Telemetry flow_string",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "flow_string"
+      }
+    },
+    {
+      "id": "L1-110",
+      "name": "Telemetry boolean_level",
+      "area": "faults",
+      "category": "robustness",
+      "kind": "fault",
+      "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+      "parameters": {
+        "fault": "boolean_level"
+      }
+    },
+    {
+      "id": "L1-111",
+      "name": "Recovery after telemetry disconnected",
+      "area": "recovery",
+      "category": "robustness",
+      "kind": "fault_recovery",
+      "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+      "parameters": {
+        "fault": "disconnected"
+      }
+    },
+    {
+      "id": "L1-112",
+      "name": "Recovery after telemetry nonnumeric",
+      "area": "recovery",
+      "category": "robustness",
+      "kind": "fault_recovery",
+      "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+      "parameters": {
+        "fault": "nonnumeric"
+      }
+    },
+    {
+      "id": "L1-113",
+      "name": "Recovery after telemetry nan",
+      "area": "recovery",
+      "category": "robustness",
+      "kind": "fault_recovery",
+      "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+      "parameters": {
+        "fault": "nan"
+      }
+    },
+    {
+      "id": "L1-114",
+      "name": "Recovery after telemetry missing_flow",
+      "area": "recovery",
+      "category": "robustness",
+      "kind": "fault_recovery",
+      "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+      "parameters": {
+        "fault": "missing_flow"
+      }
+    },
+    {
+      "id": "L1-115",
+      "name": "Modbus fc0",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "fc0"
+      }
+    },
+    {
+      "id": "L1-116",
+      "name": "Modbus fc5",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "fc5"
+      }
+    },
+    {
+      "id": "L1-117",
+      "name": "Modbus fc15",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "fc15"
+      }
+    },
+    {
+      "id": "L1-118",
+      "name": "Modbus fc23",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "fc23"
+      }
+    },
+    {
+      "id": "L1-119",
+      "name": "Modbus fc255",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "fc255"
+      }
+    },
+    {
+      "id": "L1-120",
+      "name": "Modbus p102_value65535",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "p102_value65535"
+      }
+    },
+    {
+      "id": "L1-121",
+      "name": "Modbus valve_value2",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "valve_value2"
+      }
+    },
+    {
+      "id": "L1-122",
+      "name": "Modbus legacy_level_write",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "legacy_level_write"
+      }
+    },
+    {
+      "id": "L1-123",
+      "name": "Modbus legacy_flow_write",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "legacy_flow_write"
+      }
+    },
+    {
+      "id": "L1-124",
+      "name": "Modbus scaled_flow_write",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "scaled_flow_write"
+      }
+    },
+    {
+      "id": "L1-125",
+      "name": "Modbus other_stage_write",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "other_stage_write"
+      }
+    },
+    {
+      "id": "L1-126",
+      "name": "Modbus read_gap",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "read_gap"
+      }
+    },
+    {
+      "id": "L1-127",
+      "name": "Modbus address65535",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "address65535"
+      }
+    },
+    {
+      "id": "L1-128",
+      "name": "Modbus length0",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "length0"
+      }
+    },
+    {
+      "id": "L1-129",
+      "name": "Modbus length255",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "length255"
+      }
+    },
+    {
+      "id": "L1-130",
+      "name": "Modbus truncated_header",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "truncated_header"
+      }
+    },
+    {
+      "id": "L1-131",
+      "name": "Modbus short_pdu",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "short_pdu"
+      }
+    },
+    {
+      "id": "L1-132",
+      "name": "Modbus long_pdu",
+      "area": "protocol",
+      "category": "malicious",
+      "kind": "protocol",
+      "criterion": "Malformed/unauthorized request rejected without forwarding; a valid follow-up still succeeds.",
+      "parameters": {
+        "mode": "long_pdu"
+      }
+    },
+    {
+      "id": "L1-133",
+      "name": "Unconfigured unit ID 0",
+      "area": "protocol",
+      "category": "robustness",
+      "kind": "unit",
+      "criterion": "Only the configured laboratory unit ID 1 is accepted; other unit IDs are rejected without forwarding.",
+      "parameters": {
+        "unit": 0
+      }
+    },
+    {
+      "id": "L1-134",
+      "name": "Unconfigured unit ID 2",
+      "area": "protocol",
+      "category": "robustness",
+      "kind": "unit",
+      "criterion": "Only the configured laboratory unit ID 1 is accepted; other unit IDs are rejected without forwarding.",
+      "parameters": {
+        "unit": 2
+      }
+    },
+    {
+      "id": "L1-135",
+      "name": "Unconfigured unit ID 255",
+      "area": "protocol",
+      "category": "robustness",
+      "kind": "unit",
+      "criterion": "Only the configured laboratory unit ID 1 is accepted; other unit IDs are rejected without forwarding.",
+      "parameters": {
+        "unit": 255
+      }
+    },
+    {
+      "id": "L1-136",
+      "name": "Coalesced requests in one TCP send",
+      "area": "protocol",
+      "category": "benign",
+      "kind": "coalesced",
+      "criterion": "Two coalesced TCP frames are parsed separately, acknowledged in order and forwarded exactly once each.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-137",
+      "name": "Quarantined payload with changed transaction ID",
+      "area": "rules",
+      "category": "malicious",
+      "kind": "changed_tx",
+      "criterion": "A quarantined command remains blocked with a different transaction ID; a benign command still passes.",
+      "parameters": {}
+    },
+    {
+      "id": "L1-138",
+      "name": "Small gradual bias FIT101 -0.02",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "drift",
+      "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+      "parameters": {
+        "field": "FIT101",
+        "delta": -0.02
+      }
+    },
+    {
+      "id": "L1-139",
+      "name": "Small gradual bias LIT101 +0.5",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "drift",
+      "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+      "parameters": {
+        "field": "LIT101",
+        "delta": 0.5
+      }
+    },
+    {
+      "id": "L1-140",
+      "name": "Small gradual bias LIT101 -0.5",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "drift",
+      "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+      "parameters": {
+        "field": "LIT101",
+        "delta": -0.5
+      }
+    },
+    {
+      "id": "L1-141",
+      "name": "Combined sensor spoof {'LIT101': 700.0, 'FIT101': 2.0}",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "level": 740.0,
+        "register": 100,
+        "steps": 2,
+        "overrides": {
+          "LIT101": 700.0,
+          "FIT101": 2.0
+        }
+      }
+    },
+    {
+      "id": "L1-142",
+      "name": "Combined sensor spoof {'LIT101': 740.0, 'FIT101': -0.101}",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof",
+      "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+      "parameters": {
+        "level": 740.0,
+        "register": 100,
+        "steps": 2,
+        "overrides": {
+          "LIT101": 740.0,
+          "FIT101": -0.101
+        }
+      }
+    },
+    {
+      "id": "L1-143",
+      "name": "False normal telemetry concealing hazardous register 30",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof_command",
+      "criterion": "False telemetry cannot conceal a hazardous command: no forwarding, spill or further low-level depletion.",
+      "parameters": {
+        "level": 1199.9,
+        "register": 30,
+        "overrides": {
+          "LIT101": 740.0,
+          "FIT101": 0.0
+        }
+      }
+    },
+    {
+      "id": "L1-144",
+      "name": "False normal telemetry concealing hazardous register 20",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof_command",
+      "criterion": "False telemetry cannot conceal a hazardous command: no forwarding, spill or further low-level depletion.",
+      "parameters": {
+        "level": 99.0,
+        "register": 20,
+        "overrides": {
+          "LIT101": 740.0,
+          "FIT101": 0.0
+        }
+      }
+    },
+    {
+      "id": "L1-145",
+      "name": "False normal telemetry concealing hazardous register 24",
+      "area": "sensors",
+      "category": "malicious",
+      "kind": "spoof_command",
+      "criterion": "False telemetry cannot conceal a hazardous command: no forwarding, spill or further low-level depletion.",
+      "parameters": {
+        "level": 99.0,
+        "register": 24,
+        "overrides": {
+          "LIT101": 740.0,
+          "FIT101": 0.0
+        }
+      }
+    }
+  ]
+}

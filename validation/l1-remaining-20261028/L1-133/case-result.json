@@ -1,0 +1,17 @@
+{
+  "id": "L1-133",
+  "name": "Unconfigured unit ID 0",
+  "area": "protocol",
+  "category": "robustness",
+  "kind": "unit",
+  "criterion": "Only the configured laboratory unit ID 1 is accepted; other unit IDs are rejected without forwarding.",
+  "parameters": {
+    "unit": 0
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.11985643600019102,
+  "serial_requests_recorded": 1
+}

@@ -1,0 +1,20 @@
+{
+  "id": "L1-114",
+  "name": "Recovery after telemetry missing_flow",
+  "area": "recovery",
+  "category": "robustness",
+  "kind": "fault_recovery",
+  "criterion": "Invalid telemetry fails closed, then genuine telemetry succeeds without a restart.",
+  "parameters": {
+    "fault": "missing_flow"
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "fault_fail_closed": false,
+    "recovered": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.09554807300082757,
+  "serial_requests_recorded": 2
+}

@@ -1,0 +1,21 @@
+{
+  "id": "L1-042",
+  "name": "Telemetry empty",
+  "area": "faults",
+  "category": "robustness",
+  "kind": "fault",
+  "criterion": "Faulted/incomplete telemetry fails closed; no request reaches SCADA; delayed samples rejected within the 0.1 s lab freshness requirement.",
+  "parameters": {
+    "fault": "empty"
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "elapsed_seconds": 0.02236776199970336,
+    "freshness_requirement_seconds": 0.1,
+    "fail_closed": false
+  },
+  "error": null,
+  "elapsed_seconds": 0.040945904000182054,
+  "serial_requests_recorded": 1
+}

@@ -1,0 +1,26 @@
+{
+  "id": "L1-145",
+  "name": "False normal telemetry concealing hazardous register 24",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "spoof_command",
+  "criterion": "False telemetry cannot conceal a hazardous command: no forwarding, spill or further low-level depletion.",
+  "parameters": {
+    "level": 99.0,
+    "register": 24,
+    "overrides": {
+      "LIT101": 740.0,
+      "FIT101": 0.0
+    }
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "prevented": true,
+    "actual_level": 99.0,
+    "spill_m3": 0.0
+  },
+  "error": null,
+  "elapsed_seconds": 0.05181249499946716,
+  "serial_requests_recorded": 1
+}

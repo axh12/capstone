@@ -1,0 +1,23 @@
+{
+  "id": "L1-070",
+  "name": "Legitimate multiple_sources clients",
+  "area": "traffic",
+  "category": "benign",
+  "kind": "traffic",
+  "criterion": "All valid requests reach SCADA with correct transaction IDs and source-isolated windows; no connection errors.",
+  "parameters": {
+    "pattern": "multiple_sources"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "requests": 4,
+    "forwarded": 4,
+    "model_or_guard_alarm": false,
+    "source_windows_isolated": true,
+    "max_response_seconds": 0.13700304600024538
+  },
+  "error": null,
+  "elapsed_seconds": 0.48300044700044964,
+  "serial_requests_recorded": 0
+}

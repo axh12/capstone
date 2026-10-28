@@ -327,12 +327,25 @@ class IntegrationOrchestrator:
             alternative_score = intervention_context['alternative_score']
             known_blocked = intervention_context['known_blocked']
             threshold = getattr(detection, 'threshold', self.anomaly_detector.threshold)
-            new_attributed_rule = (detection.is_anomaly and not known_blocked
-                                   and alternative_score <= threshold)
-            actionable = bool(new_attributed_rule or known_blocked)
+            sensor_issues = intervention_context.get('sensor_issues', {})
+            forecast_alarm = (intervention_context.get('forecast_score', 0) > threshold
+                              and intervention_context.get('alternative_forecast_score', 1) <= threshold)
+            overflow_risk = (intervention_context.get('forecast_spill_m3', 0) > 0
+                             and intervention_context.get('alternative_forecast_spill_m3', 0) <= 0)
+            model_crossing = (detection.is_anomaly and alternative_score is not None
+                              and alternative_score <= threshold)
+            new_attributed_rule = (not known_blocked and not sensor_issues
+                                   and (model_crossing or forecast_alarm or overflow_risk))
+            actionable = bool(new_attributed_rule or known_blocked or sensor_issues)
             if not new_attributed_rule:
                 signature['modbus_commands'] = []
             signature['rule_attribution'] = (
+                'sensor prediction residual exceeded; no command-specific rule'
+                if sensor_issues else
+                'predicted physical overflow caused by this actuator'
+                if new_attributed_rule and overflow_risk else
+                'forecast model threshold crossing caused by this actuator'
+                if new_attributed_rule and forecast_alarm and not model_crossing else
                 'model counterfactual crosses threshold for this actuator'
                 if new_attributed_rule else
                 'previously quarantined command; existing rule' if known_blocked else
@@ -348,6 +361,10 @@ class IntegrationOrchestrator:
         if intervention_context is not None:
             telemetry.detection['alternative_score'] = alternative_score
             telemetry.detection['actionable_command'] = actionable
+            for key in ('forecast_seconds', 'forecast_score', 'alternative_forecast_score',
+                        'forecast_spill_m3', 'alternative_forecast_spill_m3', 'sensor_issues'):
+                if key in intervention_context:
+                    telemetry.detection[key] = intervention_context[key]
         logger.info('Final AD/SEM result: %s', json.dumps(signature))
         self.detection_history.append(detection)
         self._finalize_telemetry(telemetry, signature)
@@ -376,6 +393,10 @@ class IntegrationOrchestrator:
             if intervention_context is None or new_attributed_rule:
                 self._handle_anomaly(detection, packets, signature,
                                      trigger_twin_response=intervention_context is None)
+        elif new_attributed_rule:
+            # Forecast/safety attribution is separate from the current-state
+            # ML verdict; preserve its score while exporting the observed command.
+            self._handle_anomaly(detection, packets, signature, trigger_twin_response=False)
         
         # Update stats
         self.stats['packets_processed'] += summary['packets_processed']
@@ -553,7 +574,10 @@ class IntegrationOrchestrator:
         
         try:
             # Emergency control actions based on attack type
-            if detection.attack_type == 'TRAFFIC':
+            if self.digital_twin.params.stage1_topology == 'swat_stage1':
+                # Isolate Stage 1: MV101 is an inlet, never a drain.
+                emergency_actions = {'p101': 0, 'p102': 0, 'mv101': 0}
+            elif detection.attack_type == 'TRAFFIC':
                 logger.warning("   Attack Type: TRAFFIC (Data Exfiltration)")
                 logger.warning("   Action: Emergency shutdown (stop all pumps)")
                 
@@ -604,9 +628,9 @@ class IntegrationOrchestrator:
             self.stats['emergency_responses'] += 1
             
             logger.info(f"   ✓ Twin state updated:")
-            logger.info(f"     LIT101={twin_state.get('LIT101', 'N/A'):.1f}")
-            logger.info(f"     LIT201={twin_state.get('LIT201', 'N/A'):.1f}")
-            logger.info(f"     LIT301={twin_state.get('LIT301', 'N/A'):.1f}")
+            for sensor in ('LIT101', 'LIT201', 'LIT301'):
+                if sensor in twin_state:
+                    logger.info('     %s=%.1f', sensor, twin_state[sensor])
             
         except Exception as e:
             logger.error(f"✗ Digital Twin response error: {e}")

@@ -1,0 +1,17 @@
+{
+  "id": "L1-075",
+  "name": "Rule selectivity different_source",
+  "area": "rules",
+  "category": "malicious",
+  "kind": "rule",
+  "criterion": "Generated command signature blocks the designated replay while the declared unrelated safe command passes.",
+  "parameters": {
+    "mode": "different_source"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.31242444700001215,
+  "serial_requests_recorded": 2
+}

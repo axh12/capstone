@@ -1,0 +1,25 @@
+{
+  "id": "L1-054",
+  "name": "Flow residual boundary 0.101 m3/h",
+  "area": "boundary",
+  "category": "malicious",
+  "kind": "spoof",
+  "criterion": "A corrupted observation triggers BLOCK; no corrupted sensor data is returned; no unrelated command rule.",
+  "parameters": {
+    "level": 740.0,
+    "register": 110,
+    "steps": 1,
+    "overrides": {
+      "FIT101": 0.101
+    }
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "prevention_passed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.05010425199907331,
+  "serial_requests_recorded": 1
+}

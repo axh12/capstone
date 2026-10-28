@@ -1,0 +1,20 @@
+{
+  "id": "L1-019",
+  "name": "Safe inlet closure at 1200 mm",
+  "area": "boundary",
+  "category": "benign",
+  "kind": "normal",
+  "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+  "parameters": {
+    "level": 1200.0,
+    "register": 30,
+    "steps": 1,
+    "value": 0
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.1363824449999811,
+  "serial_requests_recorded": 1
+}

@@ -1,0 +1,18 @@
+{
+  "id": "L1-041",
+  "name": "Frozen flow after inlet closure",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "frozen_flow",
+  "criterion": "Detect flow frozen at its earlier open-valve value after a valve-close command.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "detected": true,
+    "closing_allowed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.12119658399933542,
+  "serial_requests_recorded": 2
+}

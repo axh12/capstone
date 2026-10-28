@@ -27,7 +27,7 @@ class StateValidator:
         "distance_cm": (0.0, 1000.0),
         "AIT201_ORP": (0.0, 1000.0), "AIT202_pH": (0.0, 14.0),
     }
-    ACTUATORS = {"p101", "mv101", "p201", "p203", "mv201", "p301"}
+    ACTUATORS = {"p101", "p102", "mv101", "p201", "p203", "mv201", "p301"}
 
     def validate(self, state: Mapping[str, Any]) -> Tuple[bool, str]:
         for name, (low, high) in self.LIMITS.items():

@@ -7,6 +7,7 @@ import pandas as pd
 from detector_training import NATIVE_FEATURES, train_candidate
 from realtime_anomaly_detector import RealTimeAnomalyDetector
 from research_state_profile import (RESEARCH_STATE_FEATURES, RESEARCH_PROCESS_FEATURES,
+                                    STAGE1_ONLY_FEATURES, prepare_swat_stage1_only,
                                     SWAT_ALIGNED_FEATURES, prepare_swat_stage1,
                                     prepare_swat_process, prepare_swat_aligned)
 from gateway_window_profile import GATEWAY_WINDOW_FEATURES
@@ -18,11 +19,12 @@ def main():
     parser.add_argument("--output-dir", default="validation/corrected")
     parser.add_argument("--output", help="Explicit artifact path (compatibility with the old trainer)")
     parser.add_argument("--validate", action="store_true", help="Compatibility flag; held-out validation always runs")
-    parser.add_argument("--profile", choices=("swat", "native-twin", "swat-stage1", "swat-process", "swat-aligned", "gateway-window"), default="swat")
+    parser.add_argument("--profile", choices=("swat", "native-twin", "swat-stage1-only", "swat-stage1", "swat-process", "swat-aligned", "gateway-window"), default="swat")
     parser.add_argument("--protocol", choices=("pre_attack", "chronological", "declared_sessions"), default="chronological")
     parser.add_argument("--target-fpr", type=float, default=0.01)
     args = parser.parse_args()
-    features = (GATEWAY_WINDOW_FEATURES if args.profile == "gateway-window" else
+    features = (STAGE1_ONLY_FEATURES if args.profile == 'swat-stage1-only' else
+                GATEWAY_WINDOW_FEATURES if args.profile == "gateway-window" else
                 SWAT_ALIGNED_FEATURES if args.profile == 'swat-aligned' else
                 NATIVE_FEATURES if args.profile == "native-twin" else
                 RESEARCH_STATE_FEATURES if args.profile == "swat-stage1" else
@@ -31,7 +33,9 @@ def main():
     if args.profile == 'gateway-window' and args.protocol != 'declared_sessions':
         parser.error('gateway-window requires --protocol declared_sessions')
     data = pd.read_csv(args.data)
-    if args.profile == "swat-stage1":
+    if args.profile == 'swat-stage1-only':
+        data = prepare_swat_stage1_only(data)
+    elif args.profile == "swat-stage1":
         data = prepare_swat_stage1(data)
     elif args.profile == "swat-process":
         data = prepare_swat_process(data)

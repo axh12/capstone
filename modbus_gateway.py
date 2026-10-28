@@ -1,7 +1,7 @@
 """Inline Modbus/TCP gateway with classification before SCADA forwarding.
 
 Supports FC03 holding-register reads and FC06 binary actuator writes.
-Blocked traffic receives the isolated Twin response. Internal failures return
+Blocked traffic receives a Modbus server-device-failure response. Internal failures return
 a Modbus server-device-failure exception and never bypass classification.
 """
 from __future__ import annotations
@@ -24,7 +24,16 @@ from orchestrator import IntegrationOrchestrator
 from physical_stage1 import NullStage1Connector
 
 ACTUATORS = {20: "p101", 21: "p201", 22: "p301", 30: "mv101", 31: "mv201", 23: "p203"}
+STAGE1_ACTUATORS = {20: 'p101', 24: 'p102', 30: 'mv101'}
 SENSORS = {1: "LIT101", 2: "LIT201", 3: "LIT301", 10: "FIT101", 11: "FIT201", 12: "FIT301"}
+# Additional fixed-point registers preserve SWaT engineering-unit precision.
+SCALED_SENSORS = {100: ('LIT101', 10), 110: ('FIT101', 1000)}
+
+
+def sensor_registers(state):
+    return {**{key: int(state[name]) for key, name in SENSORS.items() if name in state},
+            **{key: round(state[name] * scale)
+               for key, (name, scale) in SCALED_SENSORS.items() if name in state}}
 
 
 def receive_exact(connection, count):
@@ -55,7 +64,7 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
 
     def __init__(self, address, upstream, pipeline, timeout=3,
                  telemetry_file=None, label=None, emergency_hook=None,
-                 window_seconds=60, forwarder=None):
+                 window_seconds=60, forwarder=None, stage1_guards=False):
         if pipeline.digital_twin is None:
             raise ValueError("Gateway requires the Physics Engine")
         if not math.isfinite(window_seconds) or window_seconds <= 0:
@@ -74,15 +83,21 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
         if label not in (None, 0, 1):
             raise ValueError("Observation label must be 0, 1 or absent")
         topology = pipeline.digital_twin.params.stage1_topology
+        if stage1_guards and topology != 'swat_stage1':
+            raise ValueError('Predictive guards require the isolated Stage-1 topology')
+        from stage1_guard import Stage1Guard
+        self.stage1_guard = Stage1Guard() if stage1_guards else None
+        self.actuators = STAGE1_ACTUATORS if topology == 'swat_stage1' else ACTUATORS
         if (topology != 'swat' and pipeline.anomaly_detector.calibration is not None
                 and pipeline.anomaly_detector.metadata.get('plant_topology') != topology):
             raise ValueError('Detector was not calibrated for the selected plant topology')
         if pipeline.anomaly_detector.calibration is not None:
             from detector_training import NATIVE_FEATURES
-            from research_state_profile import RESEARCH_STATE_FEATURES, RESEARCH_PROCESS_FEATURES
+            from research_state_profile import RESEARCH_STATE_FEATURES, RESEARCH_PROCESS_FEATURES, STAGE1_ONLY_FEATURES
             from gateway_window_profile import GATEWAY_WINDOW_FEATURES, WINDOW_SECONDS
             supported = {
                 'native-twin': NATIVE_FEATURES,
+                'swat-stage1-only': STAGE1_ONLY_FEATURES,
                 'swat-stage1': RESEARCH_STATE_FEATURES,
                 'swat-process': RESEARCH_PROCESS_FEATURES,
                 'gateway-window': GATEWAY_WINDOW_FEATURES,
@@ -94,7 +109,7 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
                 if (window_seconds != WINDOW_SECONDS or metadata.get('window_seconds') != WINDOW_SECONDS
                         or metadata.get('window_scope') != 'per_source_modbus_request'):
                     raise ValueError('gateway-window model and gateway must use the same 60-second per-source request window')
-            if pipeline.anomaly_detector.feature_source in ('swat-stage1', 'swat-process', 'gateway-window'):
+            if pipeline.anomaly_detector.feature_source in ('swat-stage1-only', 'swat-stage1', 'swat-process', 'gateway-window'):
                 from research_state_profile import initialize_twin_from_training_reference
                 initialize_twin_from_training_reference(
                     pipeline.digital_twin,
@@ -134,13 +149,13 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
         address, value = struct.unpack(">HH", request[8:12])
         twin = self.pipeline.digital_twin
         if function == 6:
-            if address not in ACTUATORS:
+            if address not in self.actuators:
                 return response_frame(request, b"\x86\x02"), False
             if value not in (0, 1):
                 return response_frame(request, b"\x86\x03"), False
             previous = deepcopy(twin.state)
             try:
-                twin.apply_actions({ACTUATORS[address]: value})
+                twin.apply_actions({self.actuators[address]: value})
                 self.pipeline.state_manager.transition(twin.step())
             except Exception:
                 twin.state = previous
@@ -149,7 +164,8 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
         if not 1 <= value <= 125:
             return response_frame(request, b"\x83\x03"), False
         state = self.pipeline.state_manager.snapshot()
-        registers = {key: int(state[name]) for key, name in {**SENSORS, **ACTUATORS}.items()}
+        registers = {**sensor_registers(state),
+                     **{key: int(state[name]) for key, name in self.actuators.items()}}
         if any(key not in registers for key in range(address, address + value)):
             return response_frame(request, b"\x83\x02"), False
         values = [registers[key] for key in range(address, address + value)]
@@ -162,28 +178,44 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
             decision_start = len(self.pipeline.decision_history)
             enforcement_start = len(self.pipeline.enforcement_history)
             emergency_start = len(self.pipeline.twin_states)
+            twin_before = None
+            forwarded = False
             try:
+                trusted_before = deepcopy(self.pipeline.digital_twin) if self.stage1_guard else None
+                sensor_issues = {}
                 if not isinstance(self.pipeline.stage1_connector, NullStage1Connector):
-                    self.pipeline.sync_stage1()
+                    measured = self.pipeline.sync_stage1()
+                    if self.stage1_guard:
+                        sensor_issues = self.stage1_guard.measurement_issues(trusted_before.snapshot(), measured)
                 twin_before = deepcopy(self.pipeline.digital_twin)
+                if sensor_issues:
+                    # A rejected observation must not remain authoritative.
+                    twin_before = trusted_before
                 intervention_context = None
                 profile = self.pipeline.anomaly_detector.feature_source
-                if (profile in ('swat-stage1', 'swat-process', 'gateway-window')
+                if (profile in ('swat-stage1-only', 'swat-stage1', 'swat-process', 'gateway-window')
                         and len(request) == 12 and request[7] == 6):
                     register, value = struct.unpack('>HH', request[8:12])
-                    if register in ACTUATORS and value in (0, 1):
+                    if register in self.actuators and value in (0, 1):
                         alternative = deepcopy(twin_before)
-                        alternative.apply_actions({ACTUATORS[register]: 1 - value})
+                        alternative.apply_actions({self.actuators[register]: 1 - value})
                         alternative_state = alternative.step()
                         intervention_context = {
                             'alternative_state': alternative_state,
                             'known_blocked': (6, register, value) in self._blocked_commands,
                         }
+                        if self.stage1_guard and not intervention_context['known_blocked'] and not sensor_issues:
+                            intervention_context.update(self.stage1_guard.forecast(
+                                twin_before, self.actuators[register], value,
+                                self.pipeline.anomaly_detector))
+                if sensor_issues:
+                    intervention_context = {'alternative_score': None, 'known_blocked': False,
+                                            'sensor_issues': sensor_issues}
                 packet = PacketEvent(source[0], self.server_address[0], source[1],
                                      self.server_address[1], "tcp", len(request), datetime.now())
                 packet.modbus_payload = request
                 packets = self.packets_for_source(packet)
-                if intervention_context is not None:
+                if intervention_context is not None and 'alternative_state' in intervention_context:
                     alternative_features = intervention_context.pop('alternative_state')
                     if profile == 'gateway-window':
                         from feature_extractor import FeatureExtractor
@@ -195,6 +227,8 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
                     intervention_context['alternative_score'] = self.pipeline.anomaly_detector.predict(
                         alternative_features).ensemble_score
                 twin_reply, supported = self.twin_response(request)
+                if not supported:
+                    return twin_reply
                 result = self.pipeline._process_packet_batch(
                     packets, intervention_context=intervention_context,
                     new_packet_count=1)
@@ -210,6 +244,8 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
                     if result['new_attributed_rule']:
                         self._blocked_commands.add((6, register, value))
                         self.pipeline._trigger_digital_twin_response(result['detection'])
+                    elif sensor_issues:
+                        self.pipeline._trigger_digital_twin_response(result['detection'])
                     self.pipeline._previous_process_state = self.pipeline.state_manager.snapshot()
                     self.pipeline.telemetry_events[-1].detection['twin_commit'] = 'withheld'
                 elif intervention_context is not None:
@@ -224,17 +260,36 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
                 if result["decision"] != "ALLOW":
                     # A blocked write was never committed upstream. Returning
                     # the FC06 success echo would falsely acknowledge it.
-                    if request[7] == 6:
-                        return response_frame(request, b"\x86\x04")
-                    return twin_reply
+                    # A sensor alarm must not leak an untrusted Twin reading
+                    # in an apparently successful FC03 reply either.
+                    return response_frame(request, bytes([request[7] | 0x80, 4]))
                 reply = self.forward_allowed_request(request)
                 if reply[:4] != request[:4] or reply[6] != request[6] or reply[7] not in (request[7], request[7] | 0x80):
                     raise ValueError("Upstream response does not match transaction")
+                if reply[7] != request[7]:
+                    # The downstream device rejected this command. Do not
+                    # leave its simulated effect committed in the Twin.
+                    self.pipeline.digital_twin.state = twin_before.state
+                    self.pipeline.digital_twin._rng.setstate(twin_before._rng.getstate())
+                    self.pipeline.digital_twin._inlet_override_active = twin_before._inlet_override_active
+                    self.pipeline.state_manager.transition(twin_before.snapshot())
+                    self.pipeline._previous_process_state = self.pipeline.state_manager.snapshot()
+                    self.pipeline.telemetry_events[-1].detection['twin_commit'] = 'downstream_rejected'
+                    return reply
+                forwarded = True
                 return reply
             except Exception:
                 logging.exception("Gateway transaction failed; no classification bypass")
+                if twin_before is not None and not forwarded:
+                    self.pipeline.digital_twin.state = twin_before.state
+                    self.pipeline.digital_twin._rng.setstate(twin_before._rng.getstate())
+                    self.pipeline.digital_twin._inlet_override_active = twin_before._inlet_override_active
+                    self.pipeline.state_manager.transition(twin_before.snapshot())
                 return response_frame(request, bytes([request[7] | 0x80, 4]))
             finally:
+                for event in self.pipeline.telemetry_events[event_start:]:
+                    event.network['transaction_id'] = int.from_bytes(request[:2], 'big')
+                    event.detection['forwarded'] = forwarded
                 if self.telemetry_file:
                     try:
                         self.telemetry_file.parent.mkdir(parents=True, exist_ok=True)
@@ -242,6 +297,7 @@ class ModbusGateway(socketserver.ThreadingTCPServer):
                             for event in self.pipeline.telemetry_events[event_start:]:
                                 row = event.to_dict()
                                 row['label'] = self.label
+                                row['forwarded'] = forwarded
                                 row['decision'] = (self.pipeline.decision_history[-1]['decision']
                                     if len(self.pipeline.decision_history) > decision_start else 'ERROR')
                                 row['enforcement'] = self.pipeline.enforcement_history[enforcement_start:]

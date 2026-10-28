@@ -1,0 +1,65 @@
+{
+  "scoring_version": "normal_ecdf_tail_v2",
+  "feature_source": "swat-stage1-only",
+  "runtime_sklearn": "1.9.1",
+  "protocol": "chronological",
+  "split": {
+    "train_normal": 4917,
+    "calibration_normal": 778,
+    "test": 2640,
+    "test_normal": 1321,
+    "test_attack": 1319,
+    "test_start": "2019-12-06T13:01:01+00:00"
+  },
+  "calibration_resolution": 0.0012836970474967907,
+  "target_fpr_supported": true,
+  "calibration": {
+    "threshold": 0.6741053273688491,
+    "samples": 778,
+    "confusion_matrix": {
+      "tn": 772,
+      "fp": 6,
+      "fn": 0,
+      "tp": 0
+    },
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "false_positive_rate": 0.007712082262210797
+  },
+  "held_out": {
+    "threshold": 0.6741053273688491,
+    "samples": 2640,
+    "confusion_matrix": {
+      "tn": 1139,
+      "fp": 182,
+      "fn": 1094,
+      "tp": 225
+    },
+    "precision": 0.5528255528255528,
+    "recall": 0.17058377558756635,
+    "f1": 0.2607184241019699,
+    "false_positive_rate": 0.13777441332323997
+  },
+  "ensemble_only_held_out": {
+    "threshold": 0.6741053273688491,
+    "samples": 2640,
+    "confusion_matrix": {
+      "tn": 1139,
+      "fp": 182,
+      "fn": 1094,
+      "tp": 225
+    },
+    "precision": 0.5528255528255528,
+    "recall": 0.17058377558756635,
+    "f1": 0.2607184241019699,
+    "false_positive_rate": 0.13777441332323997
+  },
+  "limitations": [
+    "No threshold selected from test labels; this is not a deployment acceptance gate.",
+    "A single dataset can contain temporal drift and correlated neighboring samples.",
+    "Actuator novelty is a normal-support check, not proof of malicious intent.",
+    "Tail scales are fitted on training normals only; continuous anomaly sensitivity needs independent evaluation.",
+    "SWaT models require SWaT sensor values, not unrelated Twin sensor substitutions."
+  ]
+}

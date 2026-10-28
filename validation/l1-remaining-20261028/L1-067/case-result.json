@@ -1,0 +1,23 @@
+{
+  "id": "L1-067",
+  "name": "Legitimate slow clients",
+  "area": "traffic",
+  "category": "benign",
+  "kind": "traffic",
+  "criterion": "All valid requests reach SCADA with correct transaction IDs and source-isolated windows; no connection errors.",
+  "parameters": {
+    "pattern": "slow"
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "requests": 4,
+    "forwarded": 4,
+    "model_or_guard_alarm": false,
+    "source_windows_isolated": true,
+    "max_response_seconds": 0.1400497249996988
+  },
+  "error": null,
+  "elapsed_seconds": 0.8649147730011464,
+  "serial_requests_recorded": 0
+}

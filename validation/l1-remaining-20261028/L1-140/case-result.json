@@ -1,0 +1,32 @@
+{
+  "id": "L1-140",
+  "name": "Small gradual bias LIT101 -0.5",
+  "area": "sensors",
+  "category": "malicious",
+  "kind": "drift",
+  "criterion": "Detect the gradual 20-observation bias sequence; do not silently accept the whole sequence.",
+  "parameters": {
+    "field": "LIT101",
+    "delta": -0.5
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {
+    "detected": false,
+    "first_block_step": null,
+    "final_observed": {
+      "LIT101": 729.4,
+      "FIT101": 0.0
+    },
+    "actual": {
+      "LIT101": 739.4,
+      "FIT101": 0.0,
+      "p101": 0,
+      "p102": 0,
+      "mv101": 0
+    }
+  },
+  "error": null,
+  "elapsed_seconds": 0.41597109100075613,
+  "serial_requests_recorded": 20
+}

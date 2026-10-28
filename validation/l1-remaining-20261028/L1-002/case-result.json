@@ -1,0 +1,19 @@
+{
+  "id": "L1-002",
+  "name": "Normal filling at 700 mm",
+  "area": "normal",
+  "category": "benign",
+  "kind": "normal",
+  "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+  "parameters": {
+    "level": 700.0,
+    "register": 30,
+    "steps": 5
+  },
+  "passed": false,
+  "status": "FAIL",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.6600726229989959,
+  "serial_requests_recorded": 5
+}

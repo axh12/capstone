@@ -1,0 +1,18 @@
+{
+  "id": "L1-076",
+  "name": "Genuine telemetry recovery after sensor alarm",
+  "area": "recovery",
+  "category": "benign",
+  "kind": "recovery",
+  "criterion": "After a rejected falsified reading, restored genuine telemetry is accepted.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "forged_read_rejected": true,
+    "genuine_read_allowed": true
+  },
+  "error": null,
+  "elapsed_seconds": 0.05950482899970666,
+  "serial_requests_recorded": 2
+}

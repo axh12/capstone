@@ -1,0 +1,1900 @@
+............................2026-10-28 13:00:23,969 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:23,969 - INFO - ✓ Integration Orchestrator initialized
+..2026-10-28 13:00:23,970 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:23,971 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:23,973 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:23.973120",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    39539
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:23,973 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:23.972229", "attack_type": "UNKNOWN", "anomaly_score": 0.1, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [39539], "ip_pairs": ["192.0.2.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": [{"function_code": 6, "register": 23, "value": 1, "count": 1}], "rule_attribution": "no process anomaly; no command rule"}
+✗ Failed to load models: Legacy scoring artifact: retrain with train_models.py
+✓ Loaded anomaly detection models from /tmp/tmpjv9ibii7/legacy.pkl
+✓ Loaded anomaly detection models from /tmp/tmp81mxpk2f/candidate.pkl
+✗ Failed to load models: Model/runtime sklearn versions differ; retrain in this environment
+✓ Loaded anomaly detection models from /tmp/tmph0haruns/candidate.pkl
+{"component": "MOCK_SCADA", "function": 6, "register": 23, "value_or_count": 1}
+2026-10-28 13:00:23,976 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:23.976108",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    39539
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1",
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 2
+    }
+  ]
+}
+2026-10-28 13:00:23,976 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:23.975160", "attack_type": "UNKNOWN", "anomaly_score": 0.1, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [39539], "ip_pairs": ["192.0.2.1_127.0.0.1", "192.0.2.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": [{"function_code": 6, "register": 23, "value": 1, "count": 2}], "rule_attribution": "no process anomaly; no command rule"}
+{"component": "MOCK_SCADA", "function": 6, "register": 23, "value_or_count": 1}
+2026-10-28 13:00:23,980 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:23.980055",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.6,
+    "packets_per_sec": 0.05,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 36.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    39539
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1",
+    "192.0.2.1_127.0.0.1",
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 3
+    }
+  ]
+}
+2026-10-28 13:00:23,981 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:23.978981", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.6, "packets_per_sec": 0.05, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 36.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [39539], "ip_pairs": ["192.0.2.1_127.0.0.1", "192.0.2.1_127.0.0.1", "192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 23, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 23, "value": 1, "count": 3}], "rule_attribution": "model counterfactual crosses threshold for this actuator"}
+2026-10-28 13:00:23,981 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:23,981 - INFO - ✓ Snort rules written to /tmp/tmpvljs144e/rules.txt
+2026-10-28 13:00:23,981 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:23,981 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:23,981 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:23,981 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:23,981 - INFO -      LIT101=500.0
+2026-10-28 13:00:23,981 - INFO -      LIT201=600.0
+2026-10-28 13:00:23,981 - INFO -      LIT301=800.0
+{"component": "MOCK_SCADA_SAFETY", "registers": {"20": 0, "21": 0, "23": 0, "22": 0}}
+.2026-10-28 13:00:23,990 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:23,990 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:23,992 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:23.992132",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    43927
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:23,992 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:23.992100", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [43927], "ip_pairs": ["192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+{"component": "MOCK_SCADA", "function": 6, "register": 30, "value_or_count": 1}
+{"component": "LAB_GATEWAY", "source": "192.0.2.1", "fixture_decision": "ALLOW", "request": "0001000000060106001e0001", "reply": "0001000000060106001e0001"}
+2026-10-28 13:00:23,994 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:23.994132",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    43927
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1",
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 2
+    }
+  ]
+}
+2026-10-28 13:00:23,995 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:23.993598", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [43927], "ip_pairs": ["192.0.2.1_127.0.0.1", "192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 2}]}
+{"component": "MOCK_SCADA", "function": 6, "register": 30, "value_or_count": 1}
+{"component": "LAB_GATEWAY", "source": "192.0.2.1", "fixture_decision": "ALLOW", "request": "0002000000060106001e0001", "reply": "0002000000060106001e0001"}
+.2026-10-28 13:00:24,006 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,006 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,013 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.013262",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    40537
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,014 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.010092", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [40537], "ip_pairs": ["192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+{"component": "MOCK_SCADA", "function": 6, "register": 30, "value_or_count": 1}
+{"component": "LAB_GATEWAY", "source": "192.0.2.1", "fixture_decision": "ALLOW", "request": "0001000000060106001e0001", "reply": "0001000000060106001e0001"}
+2026-10-28 13:00:24,017 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.017593",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    40537
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1",
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    },
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,017 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.017559", "attack_type": "LAB_FIXTURE", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [40537], "ip_pairs": ["192.0.2.1_127.0.0.1", "192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}, {"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,017 - WARNING - 🚨 Handling anomaly: LAB_FIXTURE
+2026-10-28 13:00:24,017 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,017 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,017 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,018 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,019 - INFO -      LIT101=501.5
+2026-10-28 13:00:24,019 - INFO -      LIT201=600.4
+2026-10-28 13:00:24,019 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,019 - INFO - ✓ Snort rules written to /tmp/tmpcy9mrobl/custom.rules
+{"component": "LAB_GATEWAY", "source": "192.0.2.1", "fixture_decision": "BLOCK", "request": "000100000006010600140001", "reply": "000100000003018604"}
+{"component": "MOCK_SCADA", "function": 3, "register": 20, "value_or_count": 1}
+.2026-10-28 13:00:24,030 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,030 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,031 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.031688",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    35727
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,031 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.031656", "attack_type": "LAB_FIXTURE", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [35727], "ip_pairs": ["192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,031 - WARNING - 🚨 Handling anomaly: LAB_FIXTURE
+2026-10-28 13:00:24,031 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,031 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,032 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,032 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,032 - INFO -      LIT101=499.7
+2026-10-28 13:00:24,032 - INFO -      LIT201=600.4
+2026-10-28 13:00:24,032 - INFO -      LIT301=800.0
+{"component": "LAB_GATEWAY", "source": "192.0.2.1", "fixture_decision": "BLOCK", "request": "000100000006010600140001", "reply": "000100000003018604"}
+.2026-10-28 13:00:24,033 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,033 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,035 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.035589",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    35559
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,036 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.035268", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [35559], "ip_pairs": ["192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+{"component": "MOCK_SCADA", "function": 6, "register": 30, "value_or_count": 1}
+{"component": "LAB_GATEWAY", "source": "192.0.2.1", "fixture_decision": "ALLOW", "request": "0001000000060106001e0001", "reply": "0001000000060106001e0001"}
+.2026-10-28 13:00:24,047 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,047 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:24,059 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,059 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,061 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.061595",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    32803
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [],
+  "window_command_counts": []
+}
+2026-10-28 13:00:24,063 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.061558", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [32803], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": []}
+2026-10-28 13:00:24,063 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:24,063 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,063 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,063 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,063 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,063 - INFO -      LIT101=500.0
+2026-10-28 13:00:24,063 - INFO -      LIT201=600.0
+2026-10-28 13:00:24,063 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,063 - INFO - No command signature; no Snort rule generated
+.2026-10-28 13:00:24,080 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,080 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,086 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.086106",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    34149
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,086 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.083842", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [34149], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,090 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.090256",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    34149
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    },
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,090 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.090209", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [34149], "ip_pairs": ["127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}, {"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,090 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:24,090 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,090 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,090 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,090 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,090 - INFO -      LIT101=501.5
+2026-10-28 13:00:24,090 - INFO -      LIT201=600.4
+2026-10-28 13:00:24,090 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,091 - INFO - ✓ Snort rules written to /tmp/tmp7cvxiah6/custom.rules
+.2026-10-28 13:00:24,102 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,102 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,106 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.106228",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    36141
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,106 - ERROR - Gateway transaction failed; no classification bypass
+Traceback (most recent call last):
+  File "/home/ubuntu/capstone/modbus_gateway.py", line 232, in process_request_frame
+    result = self.pipeline._process_packet_batch(
+        packets, intervention_context=intervention_context,
+        new_packet_count=1)
+  File "/home/ubuntu/capstone/orchestrator.py", line 315, in _process_packet_batch
+    detection = detection_future.result()
+  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 395, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.14/concurrent/futures/thread.py", line 86, in run
+    result = ctx.run(self.task)
+  File "/usr/lib/python3.14/concurrent/futures/thread.py", line 73, in run
+    return fn(*args, **kwargs)
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+RuntimeError: detector unavailable
+.2026-10-28 13:00:24,125 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,125 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,128 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.128147",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    33745
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,128 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.128102", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [33745], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+.2026-10-28 13:00:24,146 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,148 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,150 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.150329",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    46057
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,150 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.150289", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [46057], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,151 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.151940",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    46057
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 0,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 0,
+      "count": 1
+    },
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,152 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.151839", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [46057], "ip_pairs": ["127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 0, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 0, "count": 1}, {"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+.2026-10-28 13:00:24,163 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,163 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:24,185 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,185 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,188 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.188721",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    44549
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,188 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.188680", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [44549], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+.2026-10-28 13:00:24,199 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,200 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,203 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.203163",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    44189
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,203 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.203122", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [44189], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,203 - ERROR - Gateway transaction failed; no classification bypass
+Traceback (most recent call last):
+  File "/home/ubuntu/capstone/modbus_gateway.py", line 266, in process_request_frame
+    reply = self.forward_allowed_request(request)
+  File "/home/ubuntu/capstone/modbus_gateway.py", line 137, in forward_allowed_request
+    return self.forwarder(request)
+           ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+TimeoutError: Nano ACK missing
+.2026-10-28 13:00:24,222 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,223 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,223 - ERROR - Gateway transaction failed; no classification bypass
+Traceback (most recent call last):
+  File "/home/ubuntu/capstone/modbus_gateway.py", line 187, in process_request_frame
+    measured = self.pipeline.sync_stage1()
+  File "/home/ubuntu/capstone/orchestrator.py", line 640, in sync_stage1
+    state = self.stage1_connector.read_state()
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+TimeoutError: serial telemetry stopped
+.2026-10-28 13:00:24,245 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,245 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,249 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.248963",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    43169
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [],
+  "window_command_counts": []
+}
+2026-10-28 13:00:24,250 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.248701", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [43169], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": []}
+.2026-10-28 13:00:24,261 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,261 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,263 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.263602",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    44041
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,263 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.263566", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [44041], "ip_pairs": ["192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,265 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.265020",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.2"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    44041
+  ],
+  "ip_pairs": [
+    "192.0.2.2_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "192.0.2.2",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,265 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.264606", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.2"], "dst_ips": ["127.0.0.1"], "ports": [44041], "ip_pairs": ["192.0.2.2_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "192.0.2.2", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,266 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.266523",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    44041
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1",
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    },
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,267 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.266097", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [44041], "ip_pairs": ["192.0.2.1_127.0.0.1", "192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 23, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}, {"function_code": 6, "register": 23, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,267 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:24,267 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,267 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,267 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,267 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,267 - INFO -      LIT101=500.9
+2026-10-28 13:00:24,267 - INFO -      LIT201=601.1
+2026-10-28 13:00:24,267 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,268 - INFO - ✓ Snort rules written to /tmp/tmpc41sltdf/custom.rules
+.2026-10-28 13:00:24,275 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,276 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:24,288 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,288 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,290 - ERROR - Gateway transaction failed; no classification bypass
+Traceback (most recent call last):
+  File "/home/ubuntu/capstone/modbus_gateway.py", line 232, in process_request_frame
+    result = self.pipeline._process_packet_batch(
+        packets, intervention_context=intervention_context,
+        new_packet_count=1)
+  File "/home/ubuntu/capstone/orchestrator.py", line 316, in _process_packet_batch
+    signature = signature_future.result()
+  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 450, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 395, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.14/concurrent/futures/thread.py", line 86, in run
+    result = ctx.run(self.task)
+  File "/usr/lib/python3.14/concurrent/futures/thread.py", line 73, in run
+    return fn(*args, **kwargs)
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+RuntimeError: SEM unavailable
+.2026-10-28 13:00:24,309 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,309 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,311 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.311487",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    37519
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,312 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.311449", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [37519], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 23, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 23, "value": 1, "count": 1}], "rule_attribution": "model counterfactual crosses threshold for this actuator"}
+2026-10-28 13:00:24,312 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:24,312 - INFO - ✓ Snort rules written to /tmp/tmpg8k572mh/custom.rules
+2026-10-28 13:00:24,312 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,312 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,312 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,312 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,312 - INFO -      LIT101=500.0
+2026-10-28 13:00:24,312 - INFO -      LIT201=600.0
+2026-10-28 13:00:24,312 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,314 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.314703",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    37519
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 2
+    }
+  ]
+}
+2026-10-28 13:00:24,315 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.314676", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [37519], "ip_pairs": ["127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": [{"function_code": 6, "register": 23, "value": 1, "count": 2}], "rule_attribution": "previously quarantined command; existing rule"}
+2026-10-28 13:00:24,316 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.316930",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.6,
+    "packets_per_sec": 0.05,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 36.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    37519
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 2
+    },
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,317 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.315997", "attack_type": "UNKNOWN", "anomaly_score": 0.1, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.6, "packets_per_sec": 0.05, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 36.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [37519], "ip_pairs": ["127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": [{"function_code": 6, "register": 23, "value": 1, "count": 2}, {"function_code": 6, "register": 30, "value": 1, "count": 1}], "rule_attribution": "no process anomaly; no command rule"}
+.2026-10-28 13:00:24,330 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,330 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,331 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.331834",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    39361
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,332 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.331794", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [39361], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,333 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:24,333 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,333 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,333 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,333 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,333 - INFO -      LIT101=499.7
+2026-10-28 13:00:24,333 - INFO -      LIT201=600.4
+2026-10-28 13:00:24,333 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,333 - INFO - ✓ Snort rules written to /tmp/tmp9l1j41v6/custom.rules
+2026-10-28 13:00:24,335 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.335246",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    39361
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 2
+    }
+  ]
+}
+2026-10-28 13:00:24,335 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.335213", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [39361], "ip_pairs": ["127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 2}]}
+2026-10-28 13:00:24,335 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:24,335 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,335 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,335 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,335 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,335 - INFO -      LIT101=499.3
+2026-10-28 13:00:24,335 - INFO -      LIT201=600.7
+2026-10-28 13:00:24,335 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,335 - INFO - ✓ Snort rules written to /tmp/tmp9l1j41v6/custom.rules
+.2026-10-28 13:00:24,351 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,351 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:24,372 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,373 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,387 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.387336",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    40883
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,387 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.387288", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [40883], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,387 - ERROR - Gateway transaction failed; no classification bypass
+Traceback (most recent call last):
+  File "/home/ubuntu/capstone/modbus_gateway.py", line 266, in process_request_frame
+    reply = self.forward_allowed_request(request)
+  File "/home/ubuntu/capstone/modbus_gateway.py", line 138, in forward_allowed_request
+    with socket.create_connection(self.upstream, timeout=self.timeout) as upstream:
+         ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/socket.py", line 870, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.14/socket.py", line 855, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+.2026-10-28 13:00:24,395 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,395 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:24,416 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,416 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,418 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.418685",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    42581
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,418 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.418646", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [42581], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+2026-10-28 13:00:24,418 - WARNING - 🚨 Handling anomaly: None
+2026-10-28 13:00:24,418 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:24,418 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:24,419 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:24,419 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:24,419 - INFO -      LIT101=499.7
+2026-10-28 13:00:24,419 - INFO -      LIT201=600.4
+2026-10-28 13:00:24,419 - INFO -      LIT301=800.0
+2026-10-28 13:00:24,419 - INFO - ✓ Snort rules written to /tmp/tmpoiz7f751/custom.rules
+2026-10-28 13:00:24,421 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.421277",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    42581
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    },
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,421 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.421241", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [42581], "ip_pairs": ["127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 30, "value": 1, "src_ip": "127.0.0.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}, {"function_code": 6, "register": 30, "value": 1, "count": 1}]}
+.2026-10-28 13:00:24,432 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,432 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,435 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.435107",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    33643
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,436 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.435064", "attack_type": "UNKNOWN", "anomaly_score": 0.1, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [33643], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}], "rule_attribution": "no process anomaly; no command rule"}
+2026-10-28 13:00:24,439 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.439245",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.4,
+    "packets_per_sec": 0.03333333333333333,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 24.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    33643
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1",
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 23,
+      "value": 1,
+      "count": 1
+    },
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,439 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.439207", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.4, "packets_per_sec": 0.03333333333333333, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 24.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [33643], "ip_pairs": ["127.0.0.1_127.0.0.1", "127.0.0.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": [{"function_code": 6, "register": 23, "value": 1, "count": 1}, {"function_code": 6, "register": 30, "value": 1, "count": 1}], "rule_attribution": "alternative actuator state is also anomalous; no command rule"}
+.2026-10-28 13:00:24,451 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,451 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:24,473 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:24,473 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:24,476 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:24.476210",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "127.0.0.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    35057
+  ],
+  "ip_pairs": [
+    "127.0.0.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "src_ip": "127.0.0.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 30,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:24,476 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:24.476177", "attack_type": "UNKNOWN", "anomaly_score": 0.1, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["127.0.0.1"], "dst_ips": ["127.0.0.1"], "ports": [35057], "ip_pairs": ["127.0.0.1_127.0.0.1"], "modbus_commands": [], "window_command_counts": [{"function_code": 6, "register": 30, "value": 1, "count": 1}], "rule_attribution": "no process anomaly; no command rule"}
+.ssssssssssss................2026-10-28 13:00:25,173 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:25,173 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:25,173 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:25,173 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:25,173 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:25,173 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:25,173 - INFO -      LIT101=500.0
+2026-10-28 13:00:25,173 - INFO -      LIT201=600.0
+2026-10-28 13:00:25,173 - INFO -      LIT301=800.0
+.....2026-10-28 13:00:25,173 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:25,176 - INFO - Final AD/SEM result: {"modbus_commands": [{"function": 6, "register": 20, "value": 1}], "timestamp": "2026-10-28T13:00:25.173978", "attack_type": "UNKNOWN", "anomaly_score": 0.9, "feature_deviations": {}}
+.2026-10-28 13:00:25,176 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:25,178 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:25,179 - INFO - Final AD/SEM result: {"modbus_commands": [], "timestamp": "2026-10-28T13:00:25.178349", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}}
+.2026-10-28 13:00:25,179 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:25,180 - INFO - Final AD/SEM result: {"modbus_commands": [{"function": 6, "register": 20, "value": 1}], "timestamp": "2026-10-28T13:00:25.180089", "attack_type": "UNKNOWN", "anomaly_score": 0.01, "feature_deviations": {}}
+.2026-10-28 13:00:25,180 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:25,180 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:25,180 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:25,181 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:25,182 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:25,183 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:25,183 - INFO - ✓ Integration Orchestrator initialized
+.2026-10-28 13:00:25,183 - INFO - ✓ Integration Orchestrator initialized
+....................................2026-10-28 13:00:25,214 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:25,216 - INFO - ✓ Integration Orchestrator initialized
+2026-10-28 13:00:25,218 - INFO - 📋 Candidate signature before detection (SEM format): {
+  "timestamp": "2026-10-28T13:00:25.218178",
+  "attack_type": "UNKNOWN",
+  "anomaly_score": 0.0,
+  "feature_deviations": {},
+  "affected_sensors": [],
+  "network_indicators": {
+    "bytes_per_sec": 0.2,
+    "packets_per_sec": 0.016666666666666666,
+    "unique_src_ips": 1,
+    "unique_dst_ips": 1,
+    "bytes_per_packet": 12.0,
+    "total_bytes": 12.0
+  },
+  "src_ips": [
+    "192.0.2.1"
+  ],
+  "dst_ips": [
+    "127.0.0.1"
+  ],
+  "ports": [
+    35475
+  ],
+  "ip_pairs": [
+    "192.0.2.1_127.0.0.1"
+  ],
+  "modbus_commands": [
+    {
+      "function": 6,
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "src_ip": "192.0.2.1",
+      "dst_ip": "127.0.0.1"
+    }
+  ],
+  "window_command_counts": [
+    {
+      "function_code": 6,
+      "register": 20,
+      "value": 1,
+      "count": 1
+    }
+  ]
+}
+2026-10-28 13:00:25,218 - INFO - Final AD/SEM result: {"timestamp": "2026-10-28T13:00:25.218142", "attack_type": "LAB_FIXTURE", "anomaly_score": 0.9, "feature_deviations": {}, "affected_sensors": [], "network_indicators": {"bytes_per_sec": 0.2, "packets_per_sec": 0.016666666666666666, "unique_src_ips": 1, "unique_dst_ips": 1, "bytes_per_packet": 12.0, "total_bytes": 12.0}, "src_ips": ["192.0.2.1"], "dst_ips": ["127.0.0.1"], "ports": [35475], "ip_pairs": ["192.0.2.1_127.0.0.1"], "modbus_commands": [{"function": 6, "function_code": 6, "register": 20, "value": 1, "src_ip": "192.0.2.1", "dst_ip": "127.0.0.1"}], "window_command_counts": [{"function_code": 6, "register": 20, "value": 1, "count": 1}]}
+2026-10-28 13:00:25,218 - WARNING - 🚨 Handling anomaly: LAB_FIXTURE
+2026-10-28 13:00:25,218 - WARNING - 🚨 TRIGGERING DIGITAL TWIN EMERGENCY RESPONSE
+2026-10-28 13:00:25,218 - WARNING -    Attack Type: UNKNOWN
+2026-10-28 13:00:25,218 - WARNING -    Action: Safe state (stop all pumps)
+2026-10-28 13:00:25,218 - INFO -    ✓ Twin state updated:
+2026-10-28 13:00:25,218 - INFO -      LIT101=499.7
+2026-10-28 13:00:25,218 - INFO -      LIT201=600.4
+2026-10-28 13:00:25,218 - INFO -      LIT301=800.0
+2026-10-28 13:00:25,218 - ERROR - Snort rule export failed: remote reload failed
+✗ Failed to load models: [Errno 2] No such file or directory: '/tmp/tmp7qnerfud/missing.pkl'
+{"component": "LAB_GATEWAY", "source": "192.0.2.1", "fixture_decision": "BLOCK", "request": "000100000006010600140001", "reply": "000100000003018604"}
+.....................2026-10-28 13:00:25,283 - INFO - ✓ Digital Twin initialized
+2026-10-28 13:00:25,283 - INFO - ✓ Integration Orchestrator initialized
+.{"component": "MOCK_SCADA", "function": 6, "register": 30, "value_or_count": 1}
+{"component": "MOCK_SCADA", "function": 6, "register": 21, "value_or_count": 1}
+{"component": "MOCK_SCADA", "function": 6, "register": 22, "value_or_count": 1}
+{"component": "MOCK_SCADA", "function": 6, "register": 23, "value_or_count": 1}
+{"component": "MOCK_SCADA", "function": 6, "register": 31, "value_or_count": 1}
+{"component": "MOCK_SCADA", "function": 6, "register": 24, "value_or_count": 1}
+{"component": "MOCK_SCADA_SAFETY", "registers": {"20": 0, "24": 0, "30": 0}}
+....
+----------------------------------------------------------------------
+Ran 160 tests in 4.787s
+
+OK (skipped=12)

@@ -119,7 +119,7 @@ def train_candidate(data, features, source, protocol="chronological", target_fpr
             "train_end": train.t_stamp.max().isoformat(),
             "calibration_start": calibration.t_stamp.min().isoformat(),
             "calibration_end": calibration.t_stamp.max().isoformat()}}
-    if source in ('swat-stage1', 'swat-process', 'gateway-window'):
+    if source in ('swat-stage1-only', 'swat-stage1', 'swat-process', 'gateway-window'):
         # A historical model needs a stated operating point for the simulated
         # plant. Derive it from training normals only, never held-out rows.
         models['training_info']['normal_reference'] = {
@@ -132,6 +132,8 @@ def train_candidate(data, features, source, protocol="chronological", target_fpr
         models['training_info']['train_sessions'] = sorted(train.session_id.unique().tolist())
         models['training_info']['calibration_sessions'] = sorted(calibration.session_id.unique().tolist())
         models['training_info']['test_sessions'] = sorted(test.session_id.unique().tolist())
+    if source == 'swat-stage1-only':
+        models['training_info']['plant_topology'] = 'swat_stage1'
     # Learn discrete support from training normals only, never evaluation labels.
     models['normal_support'] = ({name: sorted(train[name].unique().astype(float).tolist())
         for name in ('p101', 'p201', 'p203', 'p301', 'mv101', 'mv201')}

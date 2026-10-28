@@ -1,0 +1,25 @@
+{
+  "id": "L1-066",
+  "name": "Two requests on persistent TCP connection",
+  "area": "protocol",
+  "category": "benign",
+  "kind": "persistent_connection",
+  "criterion": "Two valid requests on one TCP connection are independently acknowledged and forwarded.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "requests": [
+      "1f4000000006010600140000",
+      "1f41000000060106001e0000"
+    ],
+    "replies": [
+      "1f4000000006010600140000",
+      "1f41000000060106001e0000"
+    ],
+    "forwarded": 2
+  },
+  "error": null,
+  "elapsed_seconds": 0.26742645899867057,
+  "serial_requests_recorded": 0
+}

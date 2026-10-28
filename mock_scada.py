@@ -4,8 +4,9 @@ import json
 import socketserver
 import struct
 import threading
+from copy import deepcopy
 
-from modbus_gateway import receive_frame, response_frame
+from modbus_gateway import receive_frame, response_frame, sensor_registers, STAGE1_ACTUATORS
 
 
 class MockScadaServer(socketserver.ThreadingTCPServer):
@@ -22,7 +23,23 @@ class MockScadaServer(socketserver.ThreadingTCPServer):
         self.received = []
         self.safety_events = []
         self.lock = threading.Lock()
+        self.plant = None
         super().__init__(address, MockHandler)
+
+    def initialize_plant(self, twin):
+        """Copy the initial plant; only received writes advance this mock copy."""
+        with self.lock:
+            self.plant = deepcopy(twin)
+            if twin.params.stage1_topology == 'swat_stage1':
+                self.ACTUATOR_REGISTERS = {name: register for register, name in STAGE1_ACTUATORS.items()}
+                self.registers = {}
+            self._refresh_registers()
+
+    def _refresh_registers(self):
+        state = self.plant.snapshot()
+        self.registers.update(sensor_registers(state))
+        self.registers.update({register: int(state[name])
+                               for name, register in self.ACTUATOR_REGISTERS.items()})
 
     def apply_emergency_actions(self, actions):
         """Model an out-of-band safety controller in this mock only."""
@@ -33,6 +50,9 @@ class MockScadaServer(socketserver.ThreadingTCPServer):
             updates[self.ACTUATOR_REGISTERS[actuator]] = value
         with self.lock:
             self.registers.update(updates)
+            if self.plant is not None:
+                self.plant.apply_actions(actions)
+                self._refresh_registers()
             self.safety_events.append(dict(updates))
         print(json.dumps({"component": "MOCK_SCADA_SAFETY", "registers": updates}),
               flush=True)
@@ -50,11 +70,17 @@ class MockScadaServer(socketserver.ThreadingTCPServer):
             print(json.dumps({"component": "MOCK_SCADA", "function": function,
                               "register": address, "value_or_count": value}), flush=True)
             if function == 6:
-                if address not in (20, 21, 22, 23, 30, 31):
+                if address not in self.ACTUATOR_REGISTERS.values():
                     return response_frame(request, b"\x86\x02")
                 if value not in (0, 1):
                     return response_frame(request, b"\x86\x03")
                 self.registers[address] = value
+                if self.plant is not None:
+                    actuator = next(name for name, register in self.ACTUATOR_REGISTERS.items()
+                                    if register == address)
+                    self.plant.apply_actions({actuator: value})
+                    self.plant.step()
+                    self._refresh_registers()
                 return request
             if not 1 <= value <= 125:
                 return response_frame(request, b"\x83\x03")

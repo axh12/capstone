@@ -113,6 +113,24 @@ class GatewayTests(unittest.TestCase):
         forwarder.assert_called_once_with(allowed)
         self.assertEqual(self.scada.received, [])
 
+    def test_downstream_rejection_rolls_back_twin_command(self):
+        before = self.pipeline.digital_twin.snapshot()
+        request = frame(address=30)
+        self.gateway.forwarder = Mock(return_value=response_frame(request, b'\x86\x02'))
+        self.assertEqual(self.exchange(request), response_frame(request, b'\x86\x02'))
+        self.assertEqual(self.pipeline.digital_twin.snapshot(), before)
+        self.assertEqual(self.pipeline.telemetry_events[-1].detection['twin_commit'],
+                         'downstream_rejected')
+        self.assertEqual(self.scada.received, [])
+
+    def test_physical_ack_failure_returns_error_and_rolls_back_twin(self):
+        before = self.pipeline.digital_twin.snapshot()
+        self.gateway.forwarder = Mock(side_effect=TimeoutError('Nano ACK missing'))
+        request = frame(address=30)
+        self.assertEqual(self.exchange(request), response_frame(request, b'\x86\x04'))
+        self.assertEqual(self.pipeline.digital_twin.snapshot(), before)
+        self.assertEqual(self.scada.received, [])
+
     def test_detection_failure_never_reaches_scada(self):
         self.pipeline.anomaly_detector.predict.side_effect = RuntimeError("detector unavailable")
         self.assertEqual(self.exchange(frame())[7:], b"\x86\x04")
@@ -267,10 +285,10 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual(self.exchange(frame(address=99))[7:], b"\x86\x02")
         self.assertEqual(self.scada.received, [])
 
-    def test_blocked_read_returns_twin_sensor(self):
+    def test_blocked_read_returns_failure_instead_of_untrusted_twin_sensor(self):
         self.anomaly = True
         reply = self.exchange(frame(function=3, address=1, value=1))
-        self.assertEqual(reply[7:], b"\x03\x02\x01\xf4")
+        self.assertEqual(reply[7:], b"\x83\x04")
         self.assertEqual(self.scada.received, [])
 
     def test_fragmented_frame_and_multiple_requests_on_connection(self):

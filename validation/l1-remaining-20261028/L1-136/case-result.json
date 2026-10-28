@@ -1,0 +1,25 @@
+{
+  "id": "L1-136",
+  "name": "Coalesced requests in one TCP send",
+  "area": "protocol",
+  "category": "benign",
+  "kind": "coalesced",
+  "criterion": "Two coalesced TCP frames are parsed separately, acknowledged in order and forwarded exactly once each.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {
+    "requests": [
+      "1fa400000006010600140000",
+      "1fa5000000060106001e0000"
+    ],
+    "replies": [
+      "1fa400000006010600140000",
+      "1fa5000000060106001e0000"
+    ],
+    "forwarded": 2
+  },
+  "error": null,
+  "elapsed_seconds": 0.24849424900094164,
+  "serial_requests_recorded": 0
+}

@@ -1,0 +1,15 @@
+{
+  "id": "L1-065",
+  "name": "Valid fragmented TCP request",
+  "area": "protocol",
+  "category": "benign",
+  "kind": "fragments",
+  "criterion": "A valid fragmented request is reassembled and forwarded exactly once.",
+  "parameters": {},
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.11931985299997905,
+  "serial_requests_recorded": 1
+}

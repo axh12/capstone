@@ -1,0 +1,23 @@
+{
+  "id": "L1-053",
+  "name": "Flow residual boundary 0.1 m3/h",
+  "area": "boundary",
+  "category": "benign",
+  "kind": "normal",
+  "criterion": "Every valid command is acknowledged and received by mock SCADA; no spill.",
+  "parameters": {
+    "level": 740.0,
+    "register": 20,
+    "value": 0,
+    "steps": 1,
+    "overrides": {
+      "FIT101": 0.1
+    }
+  },
+  "passed": true,
+  "status": "PASS",
+  "details": {},
+  "error": null,
+  "elapsed_seconds": 0.13895480900100665,
+  "serial_requests_recorded": 1
+}
