@@ -36,6 +36,10 @@ Contains:
     - Rule Generator
     - Decision Engine
 
+The Stage 1 connection is configured explicitly. The default runner remains
+read-only; bidirectional operation requires a verified JSON register map and
+the separate state-register writeback option.
+
 ---
 
 ### pfSense VM
@@ -71,7 +75,7 @@ Main SCADA
 
 Physical Stage 1
   |
-  | periodic read-only state synchronization
+  | mediated state/command exchange
   v
 Debian Digital Twin
 

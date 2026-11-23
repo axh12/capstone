@@ -1,0 +1,39 @@
+{
+  "host": "192.0.2.10",
+  "port": 502,
+  "unit": 1,
+  "poll_interval_seconds": 5,
+  "input_state_registers": {
+    "LIT101": 1,
+    "LIT201": 2,
+    "LIT301": 3
+  },
+  "command_registers": {
+    "p101": 20,
+    "mv101": 21,
+    "p201": 22,
+    "p203": 23,
+    "mv201": 24,
+    "p301": 25
+  },
+  "command_allowlist": [
+    "p101",
+    "mv101",
+    "p201",
+    "p203",
+    "mv201",
+    "p301"
+  ],
+  "state_registers": {
+    "LIT101": 101,
+    "LIT201": 102,
+    "LIT301": 103,
+    "p101": 110,
+    "mv101": 111,
+    "p201": 112,
+    "p203": 113,
+    "mv201": 114,
+    "p301": 115
+  },
+  "enable_writeback": false
+}

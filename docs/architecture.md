@@ -111,21 +111,28 @@ It does not implement physical equations.
 
 ---
 
-# 5. Physical Stage 1
+# 5. Physical Stage 1 Communication
 
 The physical Stage 1 is the reference plant.
 
-The Digital Twin periodically reads state from the physical Stage 1.
+The Digital Twin communicates with the physical Stage 1 through a mediated,
+allowlisted connector.
 
-Direction:
+State synchronization:
 
 Physical Stage 1 -> Digital Twin
 
-Never:
+Normal command input:
 
-Digital Twin -> Physical Stage 1
+Physical Stage 1 -> Digital Twin -> Physics Engine
 
-Attacker commands must never reach the physical plant.
+Twin state publishing:
+
+Digital Twin -> dedicated Stage 1 state registers
+
+Command registers and state registers are separate. Only explicitly mapped,
+binary actuator commands are accepted. External attacker commands never use
+the normal Stage 1 command channel.
 
 ---
 
@@ -160,6 +167,9 @@ Telemetry contains:
 - derived network statistics
 
 Telemetry is the contract between the Digital Twin and the detection system.
+
+The Twin may also publish its validated state to dedicated Stage 1 status
+registers at a configured interval.
 
 ---
 

@@ -17,7 +17,7 @@ import os
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Set
 from enum import Enum
 
 from feature_extractor import FeatureExtractor
@@ -89,6 +89,7 @@ class IntegrationOrchestrator:
         snort_apply_command: Optional[str] = None,
         stage1_connector=None,
         stage1_sync_interval_seconds: Optional[float] = None,
+        stage1_command_allowlist: Optional[Set[str]] = None,
     ):
         """
         Initialize the orchestrator.
@@ -102,6 +103,7 @@ class IntegrationOrchestrator:
             snort_rules_path: Write generated Snort rules to this path when set
             snort_blocking: Generate ``drop`` instead of ``alert`` rules
             snort_apply_command: Optional command to reload Snort; use {rules_file}
+            stage1_command_allowlist: Twin actuator names accepted from Stage 1
         """
         self.detector_model_path = detector_model_path
         self.use_real_network = use_real_network
@@ -110,8 +112,12 @@ class IntegrationOrchestrator:
         self.enable_digital_twin = enable_digital_twin
         self.stage1_connector = stage1_connector or NullStage1Connector()
         self.stage1_sync_interval_seconds = stage1_sync_interval_seconds
+        self.stage1_command_allowlist = set(stage1_command_allowlist or {
+            'p101', 'mv101', 'p201', 'p203', 'mv201', 'p301'
+        })
         self._stage1_stop = threading.Event()
         self._stage1_thread = None
+        self._last_stage1_commands: Optional[Dict[str, int]] = None
         self.state_manager = StateManager()
         self.decision_engine = DecisionEngine()
         self.snort_rule_manager = (
@@ -190,7 +196,7 @@ class IntegrationOrchestrator:
             if self.stage1_sync_interval_seconds and self.stage1_sync_interval_seconds > 0:
                 self._stage1_stop.clear()
                 self._stage1_thread = threading.Thread(
-                    target=self._stage1_sync_loop, daemon=True, name="stage1-read-only-sync"
+                    target=self._stage1_sync_loop, daemon=True, name="stage1-sync"
                 )
                 self._stage1_thread.start()
             
@@ -553,18 +559,69 @@ class IntegrationOrchestrator:
             logger.error(f"✗ Digital Twin response error: {e}")
 
     def sync_stage1(self) -> Dict:
-        """Read reference Stage 1 state into the twin; never write to it."""
+        """Exchange state and allowlisted normal commands with Stage 1.
+
+        A connector may remain read-only. Bidirectional connectors additionally
+        return normal commands and publish the Twin snapshot to dedicated state
+        registers. Unknown commands and non-binary actuator values are rejected.
+        """
         state = self.stage1_connector.read_state()
         if state:
             self.state_manager.apply_patch(state)
+
+        commands = getattr(self.stage1_connector, 'read_commands', lambda: {})()
+        self._apply_stage1_commands(commands)
+
+        publish_state = getattr(self.stage1_connector, 'publish_state', None)
+        if publish_state:
+            publish_state(self.state_manager.snapshot())
         return state
+
+    def _apply_stage1_commands(self, commands: Dict[str, int]) -> None:
+        if not commands or not self.digital_twin:
+            return
+        unknown = set(commands) - self.stage1_command_allowlist
+        if unknown:
+            raise ValueError(f"Rejected non-allowlisted Stage 1 commands: {sorted(unknown)}")
+        normalized: Dict[str, int] = {}
+        for name, value in commands.items():
+            try:
+                normalized[name] = int(value)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"Rejected non-numeric Stage 1 command {name}: {value!r}") from exc
+            if normalized[name] not in (0, 1):
+                raise ValueError(f"Rejected unsafe Stage 1 command {name}={value}; expected 0 or 1")
+
+        # Establish a baseline on the first poll. This prevents startup from
+        # replaying stale register contents as a fresh command.
+        if self._last_stage1_commands is None:
+            self._last_stage1_commands = normalized
+            return
+        changed = {
+            name: value for name, value in normalized.items()
+            if self._last_stage1_commands.get(name) != value
+        }
+        self._last_stage1_commands = normalized
+        if not changed:
+            return
+
+        self.digital_twin.apply_actions(changed)
+        twin_state = self.digital_twin.step()
+        self.state_manager.transition(twin_state)
+        self.twin_states.append({
+            'timestamp': datetime.now().isoformat(),
+            'trigger': 'stage1_command',
+            'actions': changed,
+            'resulting_state': twin_state,
+        })
+        logger.info("✓ Applied normal Stage 1 commands to Digital Twin: %s", changed)
 
     def _stage1_sync_loop(self) -> None:
         while not self._stage1_stop.wait(self.stage1_sync_interval_seconds):
             try:
                 self.sync_stage1()
             except Exception as exc:
-                logger.warning("Stage 1 read-only synchronization failed: %s", exc)
+                logger.warning("Stage 1 synchronization failed: %s", exc)
 
     def _build_telemetry_event(
         self, packets: Optional[List[PacketEvent]], feature_vector: Dict

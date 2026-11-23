@@ -2,10 +2,14 @@
 """Run the real-time detector with automatic Snort-rule export."""
 
 import argparse
+import json
 import time
 
 from orchestrator import IntegrationOrchestrator
-from physical_stage1 import ModbusReadOnlyStage1Connector
+from physical_stage1 import (
+    ModbusBidirectionalStage1Connector,
+    ModbusReadOnlyStage1Connector,
+)
 
 
 def main() -> None:
@@ -22,13 +26,36 @@ def main() -> None:
     parser.add_argument("--stage1-host", default=None, help="Optional read-only Stage-1 Modbus host")
     parser.add_argument("--stage1-port", type=int, default=502)
     parser.add_argument("--stage1-interval", type=float, default=None)
+    parser.add_argument(
+        "--stage1-config",
+        default=None,
+        help="JSON config for mediated bidirectional Stage-1 communication",
+    )
     args = parser.parse_args()
 
     # NetworkSniffer currently auto-detects the interface.  Keep this runner
     # intentionally small and safe; interface selection can be supplied by
     # the project configuration when deploying on a dedicated sensor host.
-    stage1 = (ModbusReadOnlyStage1Connector(args.stage1_host, args.stage1_port)
-              if args.stage1_host else None)
+    stage1 = None
+    stage1_interval = args.stage1_interval
+    stage1_allowlist = None
+    if args.stage1_config:
+        with open(args.stage1_config, encoding="utf-8") as handle:
+            config = json.load(handle)
+        stage1 = ModbusBidirectionalStage1Connector(
+            host=config["host"],
+            port=int(config.get("port", 502)),
+            unit=int(config.get("unit", 1)),
+            register_map=config.get("input_state_registers", {}),
+            state_register_map=config.get("state_registers", {}),
+            command_register_map=config.get("command_registers", {}),
+            command_allowlist=set(config.get("command_allowlist", [])),
+            enable_writeback=bool(config.get("enable_writeback", False)),
+        )
+        stage1_interval = stage1_interval or float(config.get("poll_interval_seconds", 5.0))
+        stage1_allowlist = set(config.get("command_allowlist", [])) or None
+    elif args.stage1_host:
+        stage1 = ModbusReadOnlyStage1Connector(args.stage1_host, args.stage1_port)
     orchestrator = IntegrationOrchestrator(
         detector_model_path=args.model,
         use_real_network=True,
@@ -38,7 +65,8 @@ def main() -> None:
         snort_blocking=args.block,
         snort_apply_command=args.apply_command,
         stage1_connector=stage1,
-        stage1_sync_interval_seconds=args.stage1_interval,
+        stage1_sync_interval_seconds=stage1_interval,
+        stage1_command_allowlist=stage1_allowlist,
     )
     if args.interface and hasattr(orchestrator.network_source, "interface"):
         orchestrator.network_source.interface = args.interface

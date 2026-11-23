@@ -1,7 +1,7 @@
 import unittest
 
 from decision_engine import Decision, DecisionEngine
-from physical_stage1 import NullStage1Connector
+from physical_stage1 import ModbusBidirectionalStage1Connector, NullStage1Connector
 from snort_integration import SnortRuleManager
 from state_manager import StateManager
 from telemetry import TelemetryEvent
@@ -21,6 +21,23 @@ class ArchitectureContractTests(unittest.TestCase):
     def test_stage1_connector_is_read_only(self):
         self.assertEqual(NullStage1Connector().read_state(), {})
         self.assertFalse(hasattr(NullStage1Connector, "write_state"))
+
+    def test_bidirectional_stage1_requires_separate_register_maps(self):
+        with self.assertRaises(ValueError):
+            ModbusBidirectionalStage1Connector(
+                "192.0.2.10",
+                state_register_map={"LIT101": 10},
+                command_register_map={"p101": 10},
+                enable_writeback=True,
+            )
+
+    def test_bidirectional_stage1_requires_state_map_for_writeback(self):
+        with self.assertRaises(ValueError):
+            ModbusBidirectionalStage1Connector(
+                "192.0.2.10",
+                command_register_map={"p101": 20},
+                enable_writeback=True,
+            )
 
     def test_normal_discards_candidate(self):
         result = DecisionEngine().decide(FakeDetection(False), {"candidate": True}, "alert")
