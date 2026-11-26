@@ -44,11 +44,12 @@ class ArduinoSerialStage1Connector:
     _PUMP = re.compile(r"Pump:\s*(ON|OFF)", re.I)
 
     def __init__(self, port: str, baudrate: int = 9600, timeout: float = 0.5,
-                 *, enable_actuation: bool = False):
+                 *, enable_actuation: bool = False, startup_wait: float = 2.2):
         self.port = port
         self.baudrate = int(baudrate)
         self.timeout = float(timeout)
         self.enable_actuation = bool(enable_actuation)
+        self.startup_wait = max(0.0, float(startup_wait))
 
     def _serial(self):
         try:
@@ -70,7 +71,13 @@ class ArduinoSerialStage1Connector:
     def read_state(self) -> Dict[str, Any]:
         state: Dict[str, Any] = {}
         with self._serial() as connection:
-            deadline = time.monotonic() + self.timeout
+            # Opening an Uno-compatible serial port commonly toggles DTR and
+            # resets the board. Wait for setup() before requesting telemetry.
+            if self.startup_wait:
+                time.sleep(self.startup_wait)
+            connection.write(b"STATUS\n")
+            connection.flush()
+            deadline = time.monotonic() + max(self.timeout, 1.0)
             while time.monotonic() < deadline:
                 raw = connection.readline()
                 if not raw:

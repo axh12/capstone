@@ -9,7 +9,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--port",
-        default="/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-if00-port0",
+        default="/dev/ttyUSB0",
     )
     parser.add_argument("--baudrate", type=int, default=9600)
     parser.add_argument("--timeout", type=float, default=1.0)
