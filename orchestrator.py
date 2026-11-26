@@ -668,7 +668,8 @@ class IntegrationOrchestrator:
 
     def _finalize_telemetry(self, event: TelemetryEvent, signature: Dict) -> None:
         """Add decoded Modbus context after SEM has examined the packet window."""
-        command = signature.get('modbus_commands', [{}])[0]
+        commands = signature.get('modbus_commands') or []
+        command = commands[0] if commands else {}
         if command:
             event.network.update({
                 'function_code': command.get('function_code', command.get('function')),

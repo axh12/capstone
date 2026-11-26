@@ -6,6 +6,8 @@ explicit state/command register maps and ``enable_writeback=True``.
 """
 from __future__ import annotations
 
+import re
+import time
 from typing import Any, Dict, Mapping, Protocol
 
 
@@ -26,6 +28,83 @@ class NullStage1Connector:
 
     def publish_state(self, state: Mapping[str, Any]) -> None:
         return None
+
+
+class ArduinoSerialStage1Connector:
+    """Read Arduino telemetry over USB serial.
+
+    The connector is deliberately read-only unless ``enable_actuation`` is
+    explicitly set.  The Arduino firmware must implement the line protocol
+    used here (``STATUS`` and ``PUMP ON/OFF``).  No command is sent during
+    construction or during a normal state read.
+    """
+
+    _DISTANCE = re.compile(r"Distance:\s*(-?\d+(?:\.\d+)?)\s*cm", re.I)
+    _FLOW = re.compile(r"Flow:\s*(-?\d+(?:\.\d+)?)\s*L/(?:min|m)", re.I)
+    _PUMP = re.compile(r"Pump:\s*(ON|OFF)", re.I)
+
+    def __init__(self, port: str, baudrate: int = 9600, timeout: float = 0.5,
+                 *, enable_actuation: bool = False):
+        self.port = port
+        self.baudrate = int(baudrate)
+        self.timeout = float(timeout)
+        self.enable_actuation = bool(enable_actuation)
+
+    def _serial(self):
+        try:
+            import serial
+        except ImportError as exc:
+            raise RuntimeError("pyserial is required for Arduino serial communication") from exc
+        return serial.Serial(self.port, self.baudrate, timeout=self.timeout,
+                             dsrdtr=False, rtscts=False)
+
+    @classmethod
+    def _parse_line(cls, line: str, state: Dict[str, Any]) -> None:
+        if match := cls._DISTANCE.search(line):
+            state["LIT101"] = float(match.group(1))
+        if match := cls._FLOW.search(line):
+            state["FIT101"] = float(match.group(1))
+        if match := cls._PUMP.search(line):
+            state["p101"] = 1 if match.group(1).upper() == "ON" else 0
+
+    def read_state(self) -> Dict[str, Any]:
+        state: Dict[str, Any] = {}
+        with self._serial() as connection:
+            deadline = time.monotonic() + self.timeout
+            while time.monotonic() < deadline:
+                raw = connection.readline()
+                if not raw:
+                    break
+                self._parse_line(raw.decode("utf-8", errors="replace"), state)
+        return state
+
+    def read_commands(self) -> Dict[str, int]:
+        return {}
+
+    def publish_state(self, state: Mapping[str, Any]) -> None:
+        return None
+
+    def set_pump(self, enabled: bool) -> None:
+        """Send an explicit pump command only when actuation is enabled."""
+        if not self.enable_actuation:
+            raise PermissionError(
+                "Physical actuation is disabled; pass enable_actuation=True only after safety checks"
+            )
+        command = b"PUMP ON\n" if enabled else b"PUMP OFF\n"
+        self._send(command)
+
+    def set_remote_control(self, enabled: bool) -> None:
+        """Enable/disable firmware remote mode; disabled mode also turns pump off."""
+        if not self.enable_actuation:
+            raise PermissionError(
+                "Physical actuation is disabled; pass enable_actuation=True only after safety checks"
+            )
+        self._send(b"REMOTE ENABLE\n" if enabled else b"REMOTE DISABLE\n")
+
+    def _send(self, command: bytes) -> None:
+        with self._serial() as connection:
+            connection.write(command)
+            connection.flush()
 
 
 class ModbusReadOnlyStage1Connector:

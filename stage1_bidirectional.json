@@ -1,0 +1,47 @@
+{
+  "host": "127.0.0.1",
+  "port": 5020,
+  "unit": 1,
+  "poll_interval_seconds": 5,
+  "input_state_registers": {
+    "LIT101": 1,
+    "LIT301": 2,
+    "LIT401": 3,
+    "FIT101": 10,
+    "FIT301": 11,
+    "FIT401": 12,
+    "p101": 20,
+    "p301": 22,
+    "mv101": 30,
+    "mv201": 31
+  },
+  "command_registers": {
+    "p101": 20,
+    "p301": 22,
+    "mv101": 30,
+    "mv201": 31
+  },
+  "command_allowlist": [
+    "p101",
+    "p301",
+    "mv101",
+    "mv201"
+  ],
+  "state_registers": {
+    "LIT101": 250,
+    "LIT201": 251,
+    "LIT301": 252,
+    "FIT101": 253,
+    "FIT201": 254,
+    "FIT301": 255,
+    "AIT201_ORP": 256,
+    "AIT202_pH": 257,
+    "p101": 258,
+    "mv101": 259,
+    "p201": 260,
+    "p203": 261,
+    "mv201": 262,
+    "p301": 263
+  },
+  "enable_writeback": false
+}

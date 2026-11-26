@@ -1,7 +1,11 @@
 import unittest
 
 from decision_engine import Decision, DecisionEngine
-from physical_stage1 import ModbusBidirectionalStage1Connector, NullStage1Connector
+from physical_stage1 import (
+    ArduinoSerialStage1Connector,
+    ModbusBidirectionalStage1Connector,
+    NullStage1Connector,
+)
 from snort_integration import SnortRuleManager
 from state_manager import StateManager
 from telemetry import TelemetryEvent
@@ -21,6 +25,19 @@ class ArchitectureContractTests(unittest.TestCase):
     def test_stage1_connector_is_read_only(self):
         self.assertEqual(NullStage1Connector().read_state(), {})
         self.assertFalse(hasattr(NullStage1Connector, "write_state"))
+
+    def test_arduino_connector_parses_telemetry(self):
+        state = {}
+        connector = ArduinoSerialStage1Connector("/dev/null")
+        connector._parse_line("Distance: 8 cm", state)
+        connector._parse_line("Flow: 2.5 L/min", state)
+        connector._parse_line("Pump: ON", state)
+        self.assertEqual(state, {"LIT101": 8.0, "FIT101": 2.5, "p101": 1})
+
+    def test_arduino_actuation_is_disabled_by_default(self):
+        connector = ArduinoSerialStage1Connector("/dev/null")
+        with self.assertRaises(PermissionError):
+            connector.set_pump(True)
 
     def test_bidirectional_stage1_requires_separate_register_maps(self):
         with self.assertRaises(ValueError):
