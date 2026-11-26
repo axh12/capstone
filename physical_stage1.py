@@ -44,7 +44,7 @@ class ArduinoSerialStage1Connector:
     _PUMP = re.compile(r"Pump:\s*(ON|OFF)", re.I)
 
     def __init__(self, port: str, baudrate: int = 9600, timeout: float = 0.5,
-                 *, enable_actuation: bool = False, startup_wait: float = 2.2):
+                 *, enable_actuation: bool = False, startup_wait: float = 3.0):
         self.port = port
         self.baudrate = int(baudrate)
         self.timeout = float(timeout)
@@ -75,9 +75,11 @@ class ArduinoSerialStage1Connector:
             # resets the board. Wait for setup() before requesting telemetry.
             if self.startup_wait:
                 time.sleep(self.startup_wait)
+            if hasattr(connection, "reset_input_buffer"):
+                connection.reset_input_buffer()
             connection.write(b"STATUS\n")
             connection.flush()
-            deadline = time.monotonic() + max(self.timeout, 1.0)
+            deadline = time.monotonic() + max(self.timeout, 2.0)
             while time.monotonic() < deadline:
                 raw = connection.readline()
                 if not raw:
