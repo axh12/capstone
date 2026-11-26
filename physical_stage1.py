@@ -56,8 +56,17 @@ class ArduinoSerialStage1Connector:
             import serial
         except ImportError as exc:
             raise RuntimeError("pyserial is required for Arduino serial communication") from exc
-        return serial.Serial(self.port, self.baudrate, timeout=self.timeout,
-                             dsrdtr=False, rtscts=False)
+        # Open with DTR already deasserted.  On Uno-compatible boards a DTR
+        # transition from a USB-UART adapter commonly resets the MCU, which
+        # would also make the LCD show its startup screen on every STATUS call.
+        connection = serial.Serial(port=None, baudrate=self.baudrate,
+                                   timeout=self.timeout, dsrdtr=False,
+                                   rtscts=False)
+        connection.dtr = False
+        connection.rts = False
+        connection.port = self.port
+        connection.open()
+        return connection
 
     @classmethod
     def _parse_line(cls, line: str, state: Dict[str, Any]) -> None:
